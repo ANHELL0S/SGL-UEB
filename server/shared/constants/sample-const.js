@@ -1,0 +1,6 @@
+export const SAMPLE_LIQUID = 'liquid'
+export const SAMPLE_SOLID = 'solid'
+export const SAMPLE_GASEOUS = 'gaseous'
+export const SAMPLE_THESIS = 'thesis'
+export const SAMPLE_PROJECT = 'project'
+export const SAMPLE_EXTERNAL = 'external'
