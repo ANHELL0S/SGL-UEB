@@ -2,27 +2,31 @@ import { useState } from 'react'
 import { AccessLabForm } from './AccessLabForm'
 import { ModalAction } from '../Modal/ActionModal'
 import { ToastGeneric } from '../../../../components/Toasts/Toast'
-import {
-	createAccessLabRequest,
-	updateAccessLabRequest,
-	deleteAccessLabRequest,
-	changeStatusAccessLabRequest,
-} from '../../../../services/api/accessLab.api'
+import { AccessService } from '../../../../services/api/accessLab.api'
+import { useNavigate } from 'react-router-dom'
+import { PATH_PRIVATE } from '@/helpers/constants.helper'
 
 export const ModalCreate = ({ onClose, onSuccess }) => {
+	const navigate = useNavigate()
+
 	const [loading, setLoading] = useState(false)
 	const [formData, setFormData] = useState({
-		type_access: '',
+		resolution_approval: '',
+		quote: '',
 		faculty: '',
 		career: '',
 		reason: '',
 		topic: '',
-		startTime: '',
-		endTime: '',
+		datePermanenceStart: '',
+		datePermanenceEnd: '',
 		director: { name: '', dni: '', email: '' },
 		applicant: [{ name: '', dni: '', email: '' }],
 		labs: [],
+		grupe: '',
 		observations: '',
+		clauses: '',
+		attached: '',
+		experiments: [],
 	})
 
 	const handleChange = e => {
@@ -36,10 +40,11 @@ export const ModalCreate = ({ onClose, onSuccess }) => {
 	const handleSubmit = async data => {
 		setLoading(true)
 		try {
-			const response = await createAccessLabRequest(data)
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await AccessService.createRequest(data)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onSuccess()
 			onClose()
+			navigate(PATH_PRIVATE.LAB_ACCESS_DETAIL.replace(':slug', response.data.data.code))
 		} catch (error) {
 			ToastGeneric({ type: 'error', message: error.message })
 		} finally {
@@ -49,7 +54,7 @@ export const ModalCreate = ({ onClose, onSuccess }) => {
 
 	const modalProps = {
 		text: {
-			title: 'Nuevo acceso',
+			title: 'Nueva investigación',
 			buttonSubmit: 'Ok, crear acceso',
 			buttonLoading: 'Creando acceso...',
 			buttonCancel: 'No, cancelar',
@@ -67,29 +72,24 @@ export const ModalCreate = ({ onClose, onSuccess }) => {
 export const ModalUpdate = ({ accessLab, onClose, onSuccess }) => {
 	const [loading, setLoading] = useState(false)
 	const [formData, setFormData] = useState({
-		type_access: accessLab?.type_access || '',
-		faculty: accessLab?.faculties?.[0]?.id_faculty || '', // Default to the first faculty's id
-		career: accessLab?.careers?.[0]?.id_career || '', // Default to the first career's id
+		resolution_approval: accessLab?.resolution_approval || '',
+		faculty: accessLab?.faculties || '',
+		career: accessLab?.careers || '',
 		reason: accessLab?.reason || '',
 		topic: accessLab?.topic || '',
-		startTime: accessLab?.startTime || '',
-		endTime: accessLab?.endTime || '',
+		datePermanenceStart: accessLab?.datePermanenceStart || '',
+		datePermanenceEnd: accessLab?.datePermanenceEnd || '',
+		grupe: accessLab?.grupe || '',
 		director: {
 			name: accessLab?.directors?.[0]?.name || '',
 			dni: accessLab?.directors?.[0]?.dni || '',
 			email: accessLab?.directors?.[0]?.email || '',
 		},
-		applicant: accessLab?.applicants?.map(applicant => ({
-			name: applicant.name || '',
-			dni: applicant.dni || '',
-			email: applicant.email || '',
-		})) || [{ name: '', dni: '', email: '' }], // Default to an empty applicant if none
-		labs:
-			accessLab?.labs?.map(lab => ({
-				id_lab: lab.id_lab || '',
-				name_lab: lab.name_lab || '',
-			})) || [],
+		applicant: accessLab?.applicants,
+		labs: accessLab?.labs,
 		observations: accessLab?.observations || '',
+		clauses: accessLab?.clauses || '',
+		attached: accessLab?.attached || '',
 	})
 
 	const handleChange = e => {
@@ -103,8 +103,8 @@ export const ModalUpdate = ({ accessLab, onClose, onSuccess }) => {
 	const handleSubmit = async data => {
 		setLoading(true)
 		try {
-			const response = await updateAccessLabRequest(accessLab?.id_access_lab, data)
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await AccessService.updateRequest(accessLab?.id_access, data)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -116,61 +116,13 @@ export const ModalUpdate = ({ accessLab, onClose, onSuccess }) => {
 
 	const modalProps = {
 		text: {
-			title: 'Editar acceso',
-			description_a: `Estás a punto de editar el acceso al laboratorio`,
+			title: 'Editar investigación',
+			description_a: `Estás a punto de editar la investigación`,
 			description_b: `${accessLab?.description}`,
 			description_c: '¿Está seguro?',
 			buttonCancel: 'No, mantenlo',
 			buttonSubmit: 'Ok, editar',
-			buttonLoading: 'Editando acceso...',
-		},
-		loading,
-		formData,
-		onClose,
-		onChange: handleChange,
-		onSubmit: handleSubmit,
-	}
-
-	return <AccessLabForm {...modalProps} />
-}
-
-export const ModalQuote = ({ accessLab, onClose, onSuccess }) => {
-	const [loading, setLoading] = useState(false)
-	const [formData, setFormData] = useState({
-		names: '',
-	})
-
-	const handleChange = e => {
-		const { name, value } = e.target
-		setFormData(prevData => ({
-			...prevData,
-			[name]: value,
-		}))
-	}
-
-	const handleSubmit = async data => {
-		setLoading(true)
-		try {
-			const response = await updateAccessLabRequest(accessLab?.id_access_lab, data)
-			ToastGeneric({ type: 'success', message: response.message })
-			onClose()
-			onSuccess()
-		} catch (error) {
-			ToastGeneric({ type: 'error', message: error.message })
-		} finally {
-			setLoading(false)
-		}
-	}
-
-	const modalProps = {
-		text: {
-			title: 'Editar acceso',
-			description_a: `Estás a punto de editar el acceso al laboratorio`,
-			description_b: `${accessLab?.description}`,
-			description_c: '¿Está seguro?',
-			buttonCancel: 'No, mantenlo',
-			buttonSubmit: 'Ok, editar',
-			buttonLoading: 'Editando acceso...',
+			buttonLoading: 'Editando investigación...',
 		},
 		loading,
 		formData,
@@ -184,12 +136,11 @@ export const ModalQuote = ({ accessLab, onClose, onSuccess }) => {
 
 export const ModalApproved = ({ accessLab, onClose, onSuccess }) => {
 	const [loading, setLoading] = useState(false)
-
 	const handleSubmit = async () => {
 		setLoading(true)
 		try {
-			const response = await changeStatusAccessLabRequest(accessLab?.id_access_lab, { status: 'approved' })
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await AccessService.changeStatusRequest(accessLab?.id_access, { status: 'approved' })
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -202,8 +153,8 @@ export const ModalApproved = ({ accessLab, onClose, onSuccess }) => {
 	const modalProps = {
 		text: {
 			title: 'Aprobar acceso',
-			description_a: `Estás a punto de aprobar el acceso de`,
-			description_b: `${accessLab?.applicant_names} con razón "${accessLab?.experiment?.name_experiment}"`,
+			description_a: `Estás a punto de aprobar el acceso`,
+			description_b: `${accessLab?.code}"`,
 			description_c: '¿Está seguro?',
 			buttonCancel: 'No, mantenlo',
 			buttonSubmit: 'Ok, aprobar',
@@ -224,8 +175,8 @@ export const ModalPending = ({ accessLab, onClose, onSuccess }) => {
 	const handleSubmit = async () => {
 		setLoading(true)
 		try {
-			const response = await changeStatusAccessLabRequest(accessLab?.id_access_lab, { status: 'pending' })
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await AccessService.changeStatusRequest(accessLab?.id_access, { status: 'pending' })
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -239,7 +190,7 @@ export const ModalPending = ({ accessLab, onClose, onSuccess }) => {
 		text: {
 			title: 'Pendiente acceso',
 			description_a: `Estás a punto poner en pendiente el acceso de`,
-			description_b: `${accessLab?.applicant_names} con razón "${accessLab?.experiment?.name_experiment}"`,
+			description_b: `${accessLab?.code}"`,
 			description_c: '¿Está seguro?',
 			buttonCancel: 'No, mantenlo',
 			buttonSubmit: 'Ok, pendiente',
@@ -260,8 +211,8 @@ export const ModalRejected = ({ accessLab, onClose, onSuccess }) => {
 	const handleSubmit = async () => {
 		setLoading(true)
 		try {
-			const response = await changeStatusAccessLabRequest(accessLab?.id_access_lab, { status: 'rejected' })
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await AccessService.changeStatusRequest(accessLab?.id_access, { status: 'rejected' })
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -275,7 +226,7 @@ export const ModalRejected = ({ accessLab, onClose, onSuccess }) => {
 		text: {
 			title: 'Rechazar acceso',
 			description_a: `Estás a punto de rechazar el acceso de`,
-			description_b: `${accessLab?.applicant_names} con razón "${accessLab?.experiment?.name_experiment}"`,
+			description_b: `${accessLab?.code}"`,
 			description_c: '¿Está seguro?',
 			buttonCancel: 'No, mantenlo',
 			buttonSubmit: 'Ok, rechazar',
@@ -296,8 +247,8 @@ export const ModalDelete = ({ accessLab, onClose, onSuccess }) => {
 	const handleSubmit = async () => {
 		setLoading(true)
 		try {
-			const response = await deleteAccessLabRequest(accessLab?.id_access_lab)
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await AccessService.deleteRequest(accessLab?.id_access)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -310,12 +261,88 @@ export const ModalDelete = ({ accessLab, onClose, onSuccess }) => {
 	const modalProps = {
 		text: {
 			title: 'Eliminar acceso',
-			description_a: `Estás a punto de eliminar el acceso al laboratorio de`,
-			description_b: `${accessLab?.applicant_names} con razón "${accessLab?.experiment?.name_experiment}"`,
+			delete:
+				'Esta acción no eliminará permanentemente el acceso, sino que lo marcará como eliminado. Puedes restaurarlo en cualquier momento.',
+			description_a: `Estás a punto de eliminar el acceso de`,
+			description_b: `${accessLab?.code}"`,
 			description_c: '¿Está seguro?',
 			buttonCancel: 'No, mantenlo',
 			buttonSubmit: 'Ok, eliminar acceso',
 			buttonLoading: 'Eliminando acceso...',
+		},
+		actionType: 'danger',
+		loading,
+		onClose,
+		onSubmit: handleSubmit,
+	}
+
+	return <ModalAction {...modalProps} />
+}
+
+export const ModalRestore = ({ accessLab, onClose, onSuccess }) => {
+	const [loading, setLoading] = useState(false)
+
+	const handleSubmit = async () => {
+		setLoading(true)
+		try {
+			const response = await AccessService.restoreRequest(accessLab?.id_access)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
+			onClose()
+			onSuccess()
+		} catch (error) {
+			ToastGeneric({ type: 'error', message: error.message })
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const modalProps = {
+		text: {
+			title: 'Restaurar acceso',
+			description_a: `Estás a punto de restaurar el acceso`,
+			description_b: `${accessLab?.quote?.code}.`,
+			description_c: '¿Está seguro?',
+			buttonCancel: 'No, mantenlo',
+			buttonSubmit: 'Ok, restaurar',
+			buttonLoading: 'Restaurando acceso...',
+		},
+		actionType: 'success',
+		loading,
+		onClose,
+		onSubmit: handleSubmit,
+	}
+
+	return <ModalAction {...modalProps} />
+}
+
+export const ModalDeletePermanent = ({ accessLab, onClose, onSuccess }) => {
+	const [loading, setLoading] = useState(false)
+
+	const handleSubmit = async e => {
+		e.preventDefault()
+		setLoading(true)
+		try {
+			const response = await AccessService.deletePermanentRequest(accessLab?.id_access)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
+			onClose()
+			onSuccess()
+		} catch (error) {
+			ToastGeneric({ type: 'error', message: error.message })
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const modalProps = {
+		text: {
+			title: 'Eliminado permanente',
+			delete: 'Esta acción eliminará permanentemente el registro, y todas sus interacciones.',
+			description_a: `Estás a punto de eliminar el acceso`,
+			description_b: `${accessLab?.quote?.code}.`,
+			description_c: '¿Está seguro?',
+			buttonCancel: 'No, mantenlo',
+			buttonSubmit: 'Ok, eliminar',
+			buttonLoading: 'Eliminando laboratorio...',
 		},
 		actionType: 'danger',
 		loading,

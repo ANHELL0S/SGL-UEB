@@ -1,18 +1,12 @@
 import { Op, Sequelize } from 'sequelize'
-import { ReactiveEntity } from '../../domain/entities/reactiveEntity.js'
 import { UnitMeasurementEntity } from '../../domain/entities/unitMeasurementEntity.js'
-import {
-	user_Schema,
-	laboratory_Schema,
-	laboratory_analyst_Schema,
-	access_lab_Scheme,
-	reactive_Schema,
-	unit_measurement_Schema,
-} from '../../../../schema/schemes.js'
+import { ReactiveEntity } from '../../domain/entities/reactiveEntity.js'
+import { kardex_Schema, reactive_Schema, unit_measurement_Schema } from '../../../../schema/schemes.js'
 
 export class ReactiveRepository {
 	static async findByField(field, value) {
 		return await reactive_Schema.findOne({
+			paranoid: false,
 			where: {
 				[field]: value,
 			},
@@ -21,9 +15,10 @@ export class ReactiveRepository {
 
 	static async findByFieldExcept(field, value, id) {
 		return await reactive_Schema.findOne({
+			paranoid: false,
 			where: {
 				[field]: value,
-				id_lab: {
+				id_reactive: {
 					[Op.ne]: id,
 				},
 			},
@@ -41,9 +36,11 @@ export class ReactiveRepository {
 			: {}
 
 		const dataFound = await reactive_Schema.findAndCountAll({
+			paranoid: false,
 			include: [
 				{
 					model: unit_measurement_Schema,
+					paranoid: false,
 				},
 			],
 
@@ -52,49 +49,30 @@ export class ReactiveRepository {
 			offset: offset || undefined,
 			//subQuery: false, // FIXME: error en labs only show 4 register, comment == fix error
 			//distinct: true,
-			order: [['createdAt', 'DESC']],
+			order: [['updatedAt', 'DESC']],
 		})
 
 		return {
 			count: dataFound.count,
-			rows: dataFound.rows,
+			rows: dataFound.rows.map(data => new ReactiveEntity(data)),
 		}
 	}
 
 	static async findById(id) {
-		return await reactive_Schema.findByPk(id, {
+		const dataFound = await reactive_Schema.findByPk(id, {
+			paranoid: false,
 			include: [
 				{
 					model: unit_measurement_Schema,
+					paranoid: false,
 				},
 			],
 		})
-	}
-
-	static async findToName(name) {
-		const labFound = await laboratory_Schema.findOne({
-			where: { name: name },
-			include: [
-				{
-					model: laboratory_analyst_Schema,
-					include: [
-						{
-							model: user_Schema,
-							attributes: ['full_name'],
-						},
-					],
-				},
-				{
-					model: access_lab_Scheme,
-				},
-			],
-		})
-
-		return labFound ? new ReactiveEntity(labFound) : null
+		return new ReactiveEntity(dataFound)
 	}
 
 	static async findAllUnitMeasurement() {
-		const dataFound = await unit_measurement_Schema.findAll()
+		const dataFound = await unit_measurement_Schema.findAll({ paranoid: false })
 		return {
 			rows: dataFound.map(data => new UnitMeasurementEntity(data)),
 		}
@@ -104,27 +82,39 @@ export class ReactiveRepository {
 		return await reactive_Schema.bulkCreate(data, { transaction })
 	}
 
+	static async createOneReactive(data, transaction) {
+		return await reactive_Schema.create(data, { transaction })
+	}
+
+	static async createMoreKardex(data, transaction) {
+		return await kardex_Schema.bulkCreate(data, { transaction })
+	}
+
+	static async createKardex(data, transaction) {
+		return await kardex_Schema.create(data, { transaction })
+	}
+
 	static async update(id, data, transaction) {
-		return await reactive_Schema.update(data, { where: { id_reactive: id }, transaction })
+		return await reactive_Schema.update(data, { where: { id_reactive: id }, transaction, paranoid: false })
 	}
 
-	static async assignAnalystLab(data) {
-		return laboratory_analyst_Schema.create(data)
+	static async delete(id, transaction) {
+		return await reactive_Schema.destroy({ where: { id_reactive: id }, transaction, paranoid: false })
 	}
 
-	static async findLaboratoryAnalyst(id) {
-		return laboratory_analyst_Schema.findOne({ where: { id_lab_fk: id } })
+	static async restore(id, transaction) {
+		return await reactive_Schema.restore({ where: { id_reactive: id }, transaction, paranoid: false })
 	}
 
-	static async findAccessLab(id) {
-		return access_lab_Scheme.findOne({ where: { id_lab_fk: id } })
-	}
-
-	static async removeAssignAnalystLab(id, transaction) {
-		return laboratory_analyst_Schema.destroy({ where: { id_lab_fk: id }, transaction })
-	}
-
-	static async deleteLab(id, transaction) {
-		return laboratory_Schema.destroy({ where: { id_lab: id }, transaction })
+	static async deletePermanent(id, transaction) {
+		await kardex_Schema.destroy({
+			where: {
+				id_reactive_fk: id,
+			},
+			transaction,
+			force: true,
+			paranoid: false,
+		})
+		return await reactive_Schema.destroy({ where: { id_reactive: id }, transaction, paranoid: false, force: true })
 	}
 }

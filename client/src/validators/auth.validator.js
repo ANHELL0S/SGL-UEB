@@ -7,8 +7,8 @@ const authSchema = z.object({
 		.max(255, { message: 'No puede exceder 255 caracteres' }),
 	password: z
 		.string()
-		.min(8, { message: 'Debe tener al menos 8 caracteres' })
-		.max(32, { message: 'No puede exceder 32 caracteres' }),
+		.min(1, { message: 'Ingresa tu contraseña' })
+		.max(255, { message: 'No puede exceder 255 caracteres' }),
 })
 
 const requestResetPasswordSchema = z.object({

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getAllReactivesRequest } from '../services/api/reactive.api'
+import { ReactiveService } from '../services/api/reactive.api'
 
 export const useAllReactivesStore = (limit_record = 10) => {
 	const [reactives, setReactives] = useState(null)
@@ -21,11 +21,11 @@ export const useAllReactivesStore = (limit_record = 10) => {
 		try {
 			const data =
 				limit === 'all'
-					? await getAllReactivesRequest(page, undefined, debouncedSearch)
-					: await getAllReactivesRequest(page, limit, debouncedSearch)
+					? await ReactiveService.getAllRequest(page, undefined, debouncedSearch)
+					: await ReactiveService.getAllRequest(page, limit, debouncedSearch)
 			setReactives(data)
 		} catch (error) {
-			setError(error.message)
+			setError(error.response.data)
 		} finally {
 			setLoading(false)
 		}

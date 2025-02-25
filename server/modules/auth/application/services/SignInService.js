@@ -6,23 +6,24 @@ import {
 	createAccessToken,
 	createRefreshToken,
 } from '../../../../shared/helpers/jwt-helper.js'
+import { token_Schema } from '../../../../schema/schemes.js'
 
 export class SignInService {
-	static async signIn(email, password, res) {
+	static async signIn(email, password, res, req) {
 		const userFound = await SignInRepository.findUserByEmail(email)
-		if (!userFound) return { error: 'Crendenciales invalidas.' }
-		if (userFound.active === false) return { error: 'Tu cuenta está suspendida temporalmente.' }
+		if (!userFound) return { code: 404, error: 'Crendenciales invalidas.' }
+		if (userFound.active === false) return { code: 400, error: 'Tu cuenta está suspendida temporalmente.' }
 
 		const isPasswordValid = await comparePassword(password, userFound.password)
-		if (!isPasswordValid) return { error: 'Crendenciales invalidas.' }
+		if (!isPasswordValid) return { code: 400, error: 'Crendenciales invalidas.' }
 
 		const userRolesIntermediate = userFound.user_roles_intermediate.id_user_role_intermediate
-		if (!userRolesIntermediate) return { error: 'User role intermediate ID not found.' }
+		if (!userRolesIntermediate) return { code: 400, error: 'User role intermediate ID not found.' }
 
 		const userRoles = await SignInRepository.findUserRolesByIntermediateId(userRolesIntermediate)
 
 		const roleIds = userRoles.map(userRole => userRole.id_rol_fk)
-		if (roleIds.length === 0) return { error: 'No se encontraron roles del usuario.' }
+		if (roleIds.length === 0) return { code: 404, error: 'No se encontraron roles del usuario.' }
 
 		const jwtExpiredValue = env.JWT_EXPIRED
 		const expiredTokenMaxAge = convertJwtRefreshToMilliseconds(jwtExpiredValue)
@@ -49,10 +50,15 @@ export class SignInService {
 			maxAge: refreshTokenMaxAge,
 		})
 
+		await token_Schema.create({
+			token: accessToken,
+			id_user_fk: userFound.id_user,
+		})
+
 		return {
 			user: {
 				id: userFound.id_user,
-				roles: roleIds,
+				//roles: roleIds,
 			},
 			accessToken,
 			refreshToken,

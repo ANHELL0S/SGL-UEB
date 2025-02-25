@@ -5,8 +5,12 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { OfflineAlert } from './components/Banner/OfflineAlert.jsx'
 import { NetworkStatusProvider } from './context/NetworkStatusContext.jsx'
+import { SessionExpiredModal } from './components/Banner/SessionExpired.jsx'
+import { useAuthAxios } from './config/instances.js'
 
 function App() {
+	const { showModal, closeModal } = useAuthAxios()
+
 	return (
 		<NetworkStatusProvider>
 			<OfflineAlert />
@@ -15,9 +19,10 @@ function App() {
 					<Router>
 						<RoutesConfig />
 					</Router>
+					<SessionExpiredModal show={showModal} onClose={closeModal} />
 				</AuthProvider>
 			</ThemeProvider>
-			<Toaster />
+			<Toaster position={window.innerWidth < 768 ? 'top-center' : 'top-center'} />
 		</NetworkStatusProvider>
 	)
 }

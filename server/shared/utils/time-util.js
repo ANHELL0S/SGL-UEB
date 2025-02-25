@@ -1,3 +1,7 @@
+import moment from 'moment-timezone'
+
+export const getDateNow = () => moment().format('DD/MM/YYYY HH:mm')
+
 export const formattedDate = new Date().toLocaleDateString('es-ES', {
 	year: 'numeric',
 	month: 'long',
@@ -26,4 +30,8 @@ export const parseWindowMs = time => {
 	}
 	if (typeof time === 'number') return time
 	throw new Error("El valor de 'time' debe ser un número o una cadena (ejemplo: '5s', '10m', '1h').")
+}
+
+export const formatISOToDate = (isoDate, timezone = 'America/Guayaquil') => {
+	return moment(isoDate).tz(timezone).format('DD/MM/YYYY HH:mm')
 }

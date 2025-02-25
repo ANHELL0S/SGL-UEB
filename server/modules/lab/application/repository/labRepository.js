@@ -5,7 +5,7 @@ import {
 	laboratory_Schema,
 	laboratory_analyst_Schema,
 	access_lab_Scheme,
-	access_Scheme,
+	quotes_labs_Scheme,
 } from '../../../../schema/schemes.js'
 
 export class LabRepository {
@@ -14,6 +14,7 @@ export class LabRepository {
 			where: {
 				[field]: value,
 			},
+			paranoid: false,
 		})
 	}
 
@@ -25,51 +26,9 @@ export class LabRepository {
 					[Op.ne]: id,
 				},
 			},
+			paranoid: false,
 		})
 	}
-
-	/*
-	static async findAllLabs(offset, limit, search) {
-		const whereCondition = search
-			? {
-					[Sequelize.Op.or]: [
-						{ name: { [Sequelize.Op.iLike]: `%${search}%` } },
-						{ location: { [Sequelize.Op.iLike]: `%${search}%` } },
-						{ description: { [Sequelize.Op.iLike]: `%${search}%` } },
-					],
-			  }
-			: {}
-
-		const labsFound = await laboratory_Schema.findAndCountAll({
-			include: [
-				{
-					model: laboratory_analyst_Schema,
-					include: [
-						{
-							model: user_Schema,
-							attributes: ['full_name'],
-						},
-					],
-				},
-				{
-					model: access_Scheme,
-				},
-			],
-
-			where: whereCondition,
-			limit,
-			offset,
-			subQuery: false,
-			distinct: true,
-			order: [['createdAt', 'DESC']],
-		})
-
-		return {
-			count: labsFound.count,
-			rows: labsFound.rows.map(lab => new LabEntity(lab)),
-		}
-	}
-	*/
 
 	static async findAllLabs(offset, limit, search) {
 		const whereCondition = search
@@ -89,7 +48,7 @@ export class LabRepository {
 					include: [
 						{
 							model: user_Schema,
-							attributes: ['full_name'],
+							paranoid: false,
 						},
 					],
 				},
@@ -97,13 +56,11 @@ export class LabRepository {
 					model: access_lab_Scheme,
 				},
 			],
-
+			paranoid: false,
 			where: whereCondition,
 			limit: limit || undefined,
 			offset: offset || undefined,
-			//subQuery: false, // FIXME: error en labs only show 4 register, comment == fix error
-			distinct: true,
-			order: [['createdAt', 'DESC']],
+			order: [['updatedAt', 'DESC']],
 		})
 
 		return {
@@ -128,6 +85,7 @@ export class LabRepository {
 					model: access_lab_Scheme,
 				},
 			],
+			paranoid: false,
 		})
 
 		return labFound ? new LabEntity(labFound) : null
@@ -142,7 +100,7 @@ export class LabRepository {
 					include: [
 						{
 							model: user_Schema,
-							attributes: ['full_name'],
+							paranoid: false,
 						},
 					],
 				},
@@ -150,36 +108,45 @@ export class LabRepository {
 					model: access_lab_Scheme,
 				},
 			],
+			paranoid: false,
 		})
 
 		return labFound ? new LabEntity(labFound) : null
 	}
 
 	static async createLab(data, transaction) {
-		return laboratory_Schema.create(data, { transaction })
+		return await laboratory_Schema.create(data, { transaction })
 	}
 
 	static async updateLab(id, data, transaction) {
-		return laboratory_Schema.update(data, { where: { id_lab: id }, transaction })
+		return await laboratory_Schema.update(data, { where: { id_lab: id }, transaction, paranoid: false })
 	}
 
 	static async assignAnalystLab(data) {
-		return laboratory_analyst_Schema.create(data)
+		return await laboratory_analyst_Schema.create(data)
 	}
 
 	static async findLaboratoryAnalyst(id) {
-		return laboratory_analyst_Schema.findOne({ where: { id_lab_fk: id } })
+		return await laboratory_analyst_Schema.findOne({ where: { id_lab_fk: id } })
 	}
 
 	static async findAccessLab(id) {
-		return access_lab_Scheme.findOne({ where: { id_lab_fk: id } })
+		return await access_lab_Scheme.findOne({ where: { id_lab_fk: id } })
 	}
 
 	static async removeAssignAnalystLab(id, transaction) {
-		return laboratory_analyst_Schema.destroy({ where: { id_lab_fk: id }, transaction })
+		return await laboratory_analyst_Schema.destroy({ where: { id_lab_fk: id }, transaction })
 	}
 
 	static async deleteLab(id, transaction) {
-		return laboratory_Schema.destroy({ where: { id_lab: id }, transaction })
+		return await laboratory_Schema.destroy({ where: { id_lab: id }, transaction })
+	}
+
+	static async restoreLab(id, transaction) {
+		return await laboratory_Schema.restore({ where: { id_lab: id }, transaction })
+	}
+
+	static async deletePermanentLab(id, transaction) {
+		return await laboratory_Schema.destroy({ where: { id_lab: id }, transaction, paranoid: false, force: true })
 	}
 }

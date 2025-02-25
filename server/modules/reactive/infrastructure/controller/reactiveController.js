@@ -11,15 +11,9 @@ import { reactive_schema_zod, params_schema_zod, reactive_status_schema_zod } fr
 export class ReactiveController {
 	static async getAll(req, res) {
 		const { page = PAGINATION_PAGE, limit = PAGINATION_LIMIT, search = '' } = req?.query
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:page:${page}:limit:${limit}:search:${search}`
 
 		try {
-			const dataCache = await RedisCache.getFromCache(cacheKey)
-			if (dataCache) return sendResponse(res, 200, 'Reactivos obtenidos exitosamente.', dataCache)
-
 			const dataFound = await ReactiveService.getAll(page, limit === 'all' ? null : limit, search)
-			await RedisCache.setInCache(cacheKey, dataFound)
-
 			return sendResponse(res, 200, 'Reactivos obtenidos exitosamente.', dataFound)
 		} catch (error) {
 			await logEvent(
@@ -34,8 +28,6 @@ export class ReactiveController {
 	}
 
 	static async getById(req, res) {
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:${req?.params?.id}`
-
 		try {
 			const parsedData = params_schema_zod.safeParse(req?.params)
 			if (!parsedData.success) return sendResponse(res, 400, parsedData.error.errors[0].message)
@@ -45,8 +37,6 @@ export class ReactiveController {
 
 			const userFound = await ReactiveService.getLabById(req?.params?.id)
 			if (!userFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
-
-			await RedisCache.setInCache(cacheKey, userFound)
 
 			return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', userFound)
 		} catch (error) {
@@ -61,33 +51,8 @@ export class ReactiveController {
 		}
 	}
 
-	static async findToName(req, res) {
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:${req?.params?.name}`
-
-		try {
-			const cachedData = await RedisCache.getFromCache(cacheKey)
-			if (cachedData) return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', cachedData)
-
-			const dataFound = await ReactiveService.findToName(req?.params?.name)
-			if (!dataFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
-			await RedisCache.setInCache(cacheKey, dataFound)
-
-			return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', dataFound)
-		} catch (error) {
-			await logEvent(
-				'error',
-				'Error al obtener el laboratorio.',
-				{ error: error.message, stack: error.stack },
-				req?.user?.id,
-				req
-			)
-			return sendResponse(res, 500)
-		}
-	}
-
 	static async uploadedFile(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:*`
 
 		try {
 			if (!req.file) return sendResponse(res, 400, 'No se ha subido ningún archivo.')
@@ -97,14 +62,13 @@ export class ReactiveController {
 			const sheet = workbook.Sheets[sheetName]
 			const jsonData = xlsx.utils.sheet_to_json(sheet)
 
-			const result = await ReactiveService.uploadedFile(jsonData, t)
+			const result = await ReactiveService.uploadedFile(jsonData, req.user.id, t)
 			if (result.error) return sendResponse(res, result.status, result.error)
 
 			await t.commit()
-			await RedisCache.clearCache(cacheKey)
 
 			await logEvent('info', 'Reactivos creados exitosamente.', { result }, req?.user?.id, req)
-			return sendResponse(res, 201, 'Reactivos creados exitosamente.', result)
+			return sendResponse(res, result.status, result.message, result)
 		} catch (error) {
 			await logEvent(
 				'error',
@@ -120,25 +84,22 @@ export class ReactiveController {
 
 	static async create(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:*`
 
 		try {
 			const parsedData = reactive_schema_zod.safeParse(req.body)
 			if (!parsedData.success) return sendResponse(res, 400, parsedData.error.errors[0].message)
 
-			const result = await ReactiveService.create(req.body, t)
-			if (result.error) return sendResponse(res, 400, result.error)
+			const result = await ReactiveService.create(req.body, req.user.id, t)
+			if (result.error) return sendResponse(res, result.code, result.error)
 
 			await t.commit()
 
-			await RedisCache.clearCache(cacheKey)
-
-			await logEvent('info', 'Laboratorio creado exitosamente.', { result }, req?.user?.id, req)
-			return sendResponse(res, 201, 'Laboratorio creado exitosamente.', result)
+			await logEvent('info', 'Reactivo creado exitosamente.', { result }, req?.user?.id, req)
+			return sendResponse(res, 201, 'Reactivo creado exitosamente.', result)
 		} catch (error) {
 			await logEvent(
 				'error',
-				'Error al crear el laboratorio.',
+				'Error al crear el reactivo.',
 				{ error: error.message, stack: error.stack },
 				req?.user?.id,
 				req
@@ -150,7 +111,6 @@ export class ReactiveController {
 
 	static async update(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req.params)
@@ -159,21 +119,20 @@ export class ReactiveController {
 			const parsedData = reactive_schema_zod.safeParse(req.body)
 			if (!parsedData.success) return sendResponse(res, 400, parsedData.error.errors[0].message)
 
-			const labFound = await ReactiveService.getLabById(req?.params?.id)
-			if (!labFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
+			const findData = await ReactiveService.getById(req?.params?.id)
+			if (!findData) return sendResponse(res, 404, 'Reactivo no encontrado.')
 
-			const labData = await ReactiveService.updateLab(req?.params?.id, req.body, t)
-			if (labData.error) return sendResponse(res, 400, labData.error)
+			const uptData = await ReactiveService.update(req?.params?.id, req.body, req.user.id, t)
+			if (uptData.error) return sendResponse(res, uptData.code, uptData.error)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
-			await logEvent('info', 'Laboratorio actualizado exitosamente.', { labData }, req?.user?.id, req)
-			return sendResponse(res, 200, 'Laboratorio actualizado exitosamente.')
+			await logEvent('info', 'Reactivo actualizado exitosamente.', { uptData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Reactivo actualizado exitosamente.')
 		} catch (error) {
 			await logEvent(
 				'error',
-				'Error al actualizar laboratorio.',
+				'Error al actualizar reactivo.',
 				{ error: error.message, stack: error.stack },
 				req?.user?.id,
 				req
@@ -185,7 +144,6 @@ export class ReactiveController {
 
 	static async changeStatus(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
@@ -199,7 +157,6 @@ export class ReactiveController {
 
 			const userData = await ReactiveService.changeStatus(req?.params?.id, req.body, t)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
 			await logEvent('info', 'Estado de reactivo actualizado exitosamente.', { userData }, req?.user?.id, req)
@@ -219,27 +176,85 @@ export class ReactiveController {
 
 	static async delete(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.REACTIVES.REACTIVE}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
 			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
 
-			const userFound = await ReactiveService.getLabById(req?.params?.id)
-			if (!userFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
+			const userFound = await ReactiveService.getById(req?.params?.id)
+			if (!userFound) return sendResponse(res, 404, 'Reactivo no encontrado.')
 
-			const labData = await ReactiveService.deleteLab(req?.params?.id, t)
+			const labData = await ReactiveService.delete(req?.params?.id, t)
 			if (labData.error) return sendResponse(res, 400, labData.error)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
-			await logEvent('info', 'Laboratorio eliminado exitosamente.', { labData }, req?.user?.id, req)
-			return sendResponse(res, 200, 'Laboratorio eliminado exitosamente.')
+			await logEvent('info', 'Reactivo eliminado exitosamente.', { labData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Reactivo eliminado exitosamente.')
 		} catch (error) {
 			await logEvent(
 				'error',
-				'Error al eliminar el laboratorio.',
+				'Error al eliminar el reactivo.',
+				{ error: error.message, stack: error.stack },
+				req?.user?.id,
+				req
+			)
+			await t.rollback()
+			return sendResponse(res, 500)
+		}
+	}
+
+	static async restore(req, res) {
+		const t = await db_main.transaction()
+
+		try {
+			const parsedParams = params_schema_zod.safeParse(req?.params)
+			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
+
+			const findData = await ReactiveService.getById(req?.params?.id)
+			if (!findData) return sendResponse(res, 404, 'Reactivo no encontrado.')
+
+			const datFound = await ReactiveService.restore(req?.params?.id, t)
+			if (datFound.error) return sendResponse(res, 400, datFound.error)
+
+			await t.commit()
+
+			await logEvent('info', 'Reactivo restaurado exitosamente.', { datFound }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Reactivo restaurado exitosamente.')
+		} catch (error) {
+			await logEvent(
+				'error',
+				'Error al restaurado reactivo.',
+				{ error: error.message, stack: error.stack },
+				req?.user?.id,
+				req
+			)
+			await t.rollback()
+			return sendResponse(res, 500)
+		}
+	}
+
+	static async deletePermanent(req, res) {
+		const t = await db_main.transaction()
+
+		try {
+			const parsedParams = params_schema_zod.safeParse(req?.params)
+			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
+
+			const userFound = await ReactiveService.getById(req?.params?.id)
+			if (!userFound) return sendResponse(res, 404, 'Reactivo no encontrado.')
+
+			const labData = await ReactiveService.deletePermanent(req?.params?.id, t)
+			if (labData.error) return sendResponse(res, 400, labData.error)
+
+			await t.commit()
+
+			await logEvent('info', 'Reactivo eliminado permanentemente.', { labData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Reactivo eliminado permanentemente.')
+		} catch (error) {
+			await logEvent(
+				'error',
+				'Error al eliminar reactivo.',
 				{ error: error.message, stack: error.stack },
 				req?.user?.id,
 				req

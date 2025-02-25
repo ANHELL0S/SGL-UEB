@@ -1,5 +1,5 @@
 import { lab_data } from './lab_data.js'
-import { TECHNICAL_ANALYST } from '../../shared/constants/roles-const.js'
+import { ROLES } from '../../shared/constants/roles-const.js'
 import { laboratory_Schema, rol_Schema, user_Schema, laboratory_analyst_Schema } from '../../schema/schemes.js'
 
 const labSeeder = async () => {
@@ -11,7 +11,7 @@ const labSeeder = async () => {
 			return
 		}
 
-		const analystRole = await rol_Schema.findOne({ where: { type_rol: TECHNICAL_ANALYST } })
+		const analystRole = await rol_Schema.findOne({ where: { type_rol: ROLES.TECHNICAL_ANALYST } })
 		if (!analystRole) throw new Error('No se encontró el rol de analista.')
 
 		for (const lab of lab_data) {
@@ -53,7 +53,7 @@ const labSeeder = async () => {
 
 		if (labsCreated) console.log('Seeder -> Laboratorios y asignación de supervisores creados exitosamente.')
 	} catch (error) {
-		console.error('Error al crear laboratorios predeterminados:', error.message)
+		console.error('Error al crear laboratorios predeterminados:', error)
 	}
 }
 

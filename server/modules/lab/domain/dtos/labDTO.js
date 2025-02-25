@@ -1,16 +1,17 @@
 export class LabDTO {
-	static toResponse(entity) {
+	static toResponse(data) {
 		return {
-			id_lab: entity.id_lab,
-			active: entity.active,
-			name: entity.name,
-			location: entity.location,
-			description: entity.description,
-			analysts: entity.analysts,
-			//access: entity.access,
-			totalAccess: entity.totalAccess,
-			createdAt: entity.createdAt,
-			updatedAt: entity.updatedAt,
+			id_lab: data.id_lab,
+			active: data.active,
+			name: data.name,
+			location: data.location,
+			description: data.description,
+			analysts: data.analysts,
+			access: data.access,
+			totalAccess: data.totalAccess,
+			createdAt: data.createdAt,
+			updatedAt: data.updatedAt,
+			deletedAt: data.deletedAt,
 		}
 	}
 
@@ -29,7 +30,7 @@ export class LabDTO {
 	}
 
 	static toResponseList(entities) {
-		return entities.map(entity => this.toResponse(entity))
+		return entities.map(data => this.toResponse(data))
 	}
 
 	static transformData(data) {
@@ -45,8 +46,8 @@ export class LabDTO {
 
 	static assignAnalystLab(data) {
 		const transformedData = {
-			id_lab_fk: data.id_lab,
-			id_analyst_fk: data.id_user,
+			id_lab_fk: data.lab,
+			id_analyst_fk: data.user,
 		}
 
 		return transformedData

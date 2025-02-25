@@ -1,5 +1,7 @@
-export const GENERAL_ADMIN = 'general_admin'
-export const DIRECTOR = 'director'
-export const SUPERVISOR = 'supervisor'
-export const TECHNICAL_ANALYST = 'analyst'
-export const ACCESS_MANAGER = 'access_manager'
+export const ROLES = {
+	GENERAL_ADMIN: 'general_admin',
+	DIRECTOR: 'director',
+	SUPERVISOR: 'supervisor',
+	TECHNICAL_ANALYST: 'analyst',
+	ACCESS_MANAGER: 'access_manager',
+}

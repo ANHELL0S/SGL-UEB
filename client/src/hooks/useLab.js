@@ -1,76 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { findLabToNameRequest, getAllLabsRequest, getLabByIdRequest } from '../services/api/lab.api'
-
-/*
-export const useAllLabsStore = (limit_record = 10) => {
-	const [labs, setLabs] = useState(null)
-	const [error, setError] = useState(null)
-	const [loading, setLoading] = useState(true)
-
-	const [page, setPage] = useState(1)
-	const [limit, setLimit] = useState(limit_record)
-	const [search, setSearch] = useState('')
-
-	const fetchLabs = useCallback(async () => {
-		setLoading(true)
-		try {
-			const data = await getAllLabsRequest(page, limit, search)
-			setLabs(data)
-		} catch (error) {
-			setError(error.message)
-		} finally {
-			setLoading(false)
-		}
-	}, [page, limit, search])
-
-	useEffect(() => {
-		fetchLabs()
-	}, [fetchLabs, page, limit])
-
-	const labData = labs?.data?.labs || []
-	const totalRecords = labs?.data?.totalRecords || 0
-	const totalPages = Math.ceil(totalRecords / limit)
-
-	useEffect(() => {
-		if (page > totalPages) setPage(1)
-	}, [page, totalPages])
-
-	const handlePageChange = newPage => {
-		if (newPage >= 1 && newPage <= totalPages) setPage(newPage)
-	}
-
-	const handleLimitChange = e => {
-		const newLimit = parseInt(e.target.value, 10)
-		setLimit(newLimit)
-	}
-
-	const handleSearchChange = e => setSearch(e.target.value)
-
-	const handleKeyDown = e => {
-		if (e.key === 'Enter') fetchLabs()
-	}
-
-	return {
-		labs,
-		loading,
-		error,
-		page,
-		limit,
-		search,
-		setPage,
-		setLimit,
-		setSearch,
-		fetchLabs,
-		handlePageChange,
-		handleLimitChange,
-		handleSearchChange,
-		handleKeyDown,
-		labData,
-		totalRecords,
-		totalPages,
-	}
-}
-*/
+import { LabService } from '../services/api/lab.api'
 
 export const useAllLabsStore = (limit_record = 10) => {
 	const [labs, setLabs] = useState(null)
@@ -78,8 +7,8 @@ export const useAllLabsStore = (limit_record = 10) => {
 	const [loading, setLoading] = useState(true)
 
 	const [page, setPage] = useState(1)
-	const [limit, setLimit] = useState(limit_record)
 	const [search, setSearch] = useState('')
+	const [limit, setLimit] = useState(limit_record)
 	const [debouncedSearch, setDebouncedSearch] = useState(search)
 
 	useEffect(() => {
@@ -92,8 +21,8 @@ export const useAllLabsStore = (limit_record = 10) => {
 		try {
 			const data =
 				limit === 'all'
-					? await getAllLabsRequest(page, undefined, debouncedSearch)
-					: await getAllLabsRequest(page, limit, debouncedSearch)
+					? await LabService.getAllRequest(page, undefined, debouncedSearch)
+					: await LabService.getAllRequest(page, limit, debouncedSearch)
 			setLabs(data)
 		} catch (error) {
 			setError(error.message)
@@ -159,7 +88,7 @@ export const useLabStore = id => {
 		const fetchData = async () => {
 			try {
 				setLoading(true)
-				const response = await getLabByIdRequest(id)
+				const response = await LabService.getByIdRequest(id)
 				setData(response.data)
 			} catch (error) {
 				setError(error.message)
@@ -183,10 +112,10 @@ export const useFindLabToNameStore = name => {
 		const fetchData = async () => {
 			try {
 				setLoading(true)
-				const response = await findLabToNameRequest(name)
+				const response = await LabService.findLabToNameRequest(name)
 				setLab(response)
 			} catch (error) {
-				setError(error.message)
+				setError(error)
 			} finally {
 				setLoading(false)
 			}

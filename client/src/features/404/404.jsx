@@ -1,8 +1,8 @@
 import { BiArrowBack } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '../../components/Button/Button'
-import pathimg from '../../assets/images/404_error.svg'
-import { PATH_PRIVATE } from '../../helpers/constants.helper'
+import { Button } from '@/components/Button/Button'
+import pathimg from '@/assets/images/404_error.svg'
+import { PATH_PRIVATE } from '@/helpers/constants.helper'
 
 const NotFoundSection = () => {
 	const navigate = useNavigate()

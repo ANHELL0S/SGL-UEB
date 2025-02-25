@@ -21,12 +21,12 @@ const Button = ({
 		primary:
 			'text-slate-50 bg-slate-500 hover:bg-slate-500/80 border border-transparent dark:bg-cyan-600 dark:hover:bg-cyan-600/80',
 		secondary:
-			'text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600',
+			'text-slate-600 bg-slate-200 hover:bg-slate-300/80 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600',
 		none: 'text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700/50',
 		outline:
 			'border border-slate-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800',
 		danger: 'text-white bg-red-500 hover:bg-red-500/80 border border-transparent',
-		warning: 'text-white bg-orange-500 hover:bg-orange-500/80 border border-transparent',
+		warning: 'text-white bg-amber-500 hover:bg-amber-500/80 border border-transparent',
 		success:
 			'bg-green-500 hover:bg-green-500/80 border border-transparent dark:bg-emerald-600 text-green-50 dark:hover:bg-emerald-600/80',
 	}
@@ -61,7 +61,7 @@ const Button = ({
 		<button
 			type={type}
 			className={`${baseClasses} ${variants[variant]} ${sizeClasses[size]} 
-				${loading || disabled ? 'cursor-not-allowed opacity-50 pointer-events-none' : ''}`}
+				${loading || disabled ? 'cursor-not-allowed opacity-50' : ''}`}
 			disabled={loading || disabled}
 			onClick={e => {
 				if (loading || disabled) return

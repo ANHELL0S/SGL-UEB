@@ -33,29 +33,27 @@ export const Sidebar = () => {
 		<>
 			{/* Botón para abrir/cerrar sidebar en móvil */}
 			<button
-				className='fixed md:hidden bottom-4 right-4 z-10 border p-2 m-2 rounded-full transition-all duration-200 ease-in-out bg-slate-200 text-slate-600 hover:bg-slate-300 border-slate-300 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:border-slate-600'
+				className='fixed md:hidden bottom-4 right-4 z-10 border p-2 m-2 rounded-full transition-all duration-200 ease-in-out bg-slate-200 text-slate-600 hover:bg-slate-300 border-slate-300 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:border-slate-600 shadow-xl'
 				onClick={() => setIsMobileOpen(!isMobileOpen)}>
-				<BiMenuAltLeft size={24} />
+				<BiMenuAltLeft size={30} />
 			</button>
 
 			<nav
-				className={`fixed md:static top-0 left-0 bg-slate-100 dark:bg-gray-900 z-40 h-screen transition-all ease-in-out duration-100 ${
+				className={`fixed md:static top-0 left-0 bg-slate-100 dark:bg-gray-900 z-40 h-screen transition-all ease-in-out duration-200 ${
 					isMobileOpen ? 'translate-x-0 border-r dark:border-gray-700 shadow-xl' : '-translate-x-full'
-				} ${isCollapsed ? 'w-16' : 'w-1/6'} md:translate-x-0 flex flex-col`}>
+				} ${isMobileOpen ? (isCollapsed ? 'w-64' : 'w-1/2') : isCollapsed ? 'w-16' : 'w-1/6'} md:translate-x-0 flex flex-col`}>
 				{/* Header del sidebar */}
-				<div className='flex items-center justify-between p-2 pt-5'>
+				<div className='flex items-center justify-between p-1 pt-4'>
 					{!isCollapsed && (
 						<Link to={PATH_PRIVATE.DASHBOARD} className='flex items-center text-slate-700 rounded-md'>
-							<h1 className='text-slate-50 p-1 flex items-center justify-center'>
-								<img src={path_logo} alt='Logo' className='w-20 object-cover' />
-							</h1>
+							<img src={path_logo} alt='Logo' className='w-12 object-cover' />
 						</Link>
 					)}
 
 					{/* Botón para colapsar/expandir el sidebar */}
 					{!isMobileOpen && (
 						<button
-							className={`text-slate-50 hover:bg-slate-600 bg-slate-500 rounded-full p-1 transition-all ease-in-out duration-200 ${
+							className={`text-slate-50 hover:bg-slate-700 rounded-full bg-slate-600 shadow-lg p-1 transition-all ease-in-out duration-300 mt-0.5 ${
 								isCollapsed ? '-rotate-180 ml-3' : 'rotate-0 ml-3'
 							}`}
 							onClick={toggleSidebarCollapse}>
@@ -66,7 +64,7 @@ export const Sidebar = () => {
 
 				{/* Scrollable content */}
 				<div className='flex-grow overflow-y-auto pr-3 flex items-center'>
-					<div className='pl-4 flex flex-col gap-2 pt-4'>
+					<div className='pl-4 flex flex-col gap-2'>
 						{sections
 							.reduce((tags, section) => {
 								const tagIndex = tags.findIndex(tag => tag.name === section.tag)
@@ -83,10 +81,7 @@ export const Sidebar = () => {
 								)
 								return (
 									accessibleSections.length > 0 && (
-										<div key={index} className='space-y-2.5'>
-											{!isCollapsed && (
-												<p className='text-sm font-medium text-slate-400 dark:text-gray-400'>{tag.name}</p>
-											)}
+										<div key={index} className='space-y-2'>
 											{accessibleSections.map((section, idx) => (
 												<SidebarItem
 													key={idx}

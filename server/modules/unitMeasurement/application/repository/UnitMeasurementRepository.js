@@ -1,6 +1,5 @@
 import { Op, Sequelize } from 'sequelize'
 import { unit_measurement_Schema } from '../../../../schema/schemes.js'
-import { UnitMeasurementEntity } from '../../domain/entities/UnitMeasurementEntity.js'
 
 export class UnitMeasurementRepository {
 	static async findLabByField(field, value) {
@@ -35,7 +34,7 @@ export class UnitMeasurementRepository {
 			offset: offset || undefined,
 			//subQuery: false, // FIXME:  only show 4 register, comment line === fix error
 			distinct: true,
-			order: [['createdAt', 'DESC']],
+			order: [['updatedAt', 'DESC']],
 		})
 
 		return {

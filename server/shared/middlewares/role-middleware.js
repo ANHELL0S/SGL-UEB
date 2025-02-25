@@ -15,7 +15,7 @@ async function checkUserRole(req, res, next, roles) {
 		const validRoles = userRoles.map(role => role.type_rol)
 		const hasValidRole = validRoles.some(role => roles.includes(role))
 
-		if (!hasValidRole) return sendResponse(res, 401, 'No tienes permiso para realizar esta acción.')
+		if (!hasValidRole) return sendResponse(res, 403, 'No tienes permiso para realizar esta acción.')
 
 		next()
 	} catch (error) {

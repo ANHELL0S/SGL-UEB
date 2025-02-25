@@ -36,5 +36,4 @@ export const data = {
 		{ name: 'Terapia Física' },
 	],
 	'Extensión Universitaria de San Miguel': [{ name: 'Talento Humano' }, { name: 'Criminalística' }],
-	'No aplica': [{ name: 'No aplica' }],
 }

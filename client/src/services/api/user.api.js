@@ -1,86 +1,106 @@
+import { ApiService } from './_main'
 import { userInstance } from '../../config/instances'
-import { currentDate } from '../../helpers/dateTimeZone.helper'
 
-export const getInfoUserRequest = async () => {
-	try {
-		const response = await userInstance.get('/me')
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+export class UserService extends ApiService {
+	static instance = userInstance
+
+	static async getAllRequest(page, limit, search) {
+		try {
+			const response = await this.instance.get('/', { params: { page, limit, search } })
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const getAllUsersRequest = async (page, limit, search) => {
-	try {
-		const response = await userInstance.get('/', {
-			params: { page, limit, search },
-		})
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getByIdRequest(id) {
+		try {
+			const response = await this.instance.get(`/${id}`)
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const createUserRequest = async data => {
-	try {
-		const response = await userInstance.post('/', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getInfoUserRequest(id) {
+		try {
+			const response = await this.instance.get('/me')
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const managerUserRolesRequest = async data => {
-	try {
-		const response = await userInstance.post('/manager-role', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async createRequest(data) {
+		try {
+			return await this.instance.post('/', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const updateUserRequest = async (id, data) => {
-	try {
-		const response = await userInstance.put(`/${id}`, data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async managerUserRolesRequest(data) {
+		try {
+			return await this.instance.post('/manager-role', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const updateAccountRequest = async data => {
-	try {
-		const response = await userInstance.put('/', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async updateRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const updatePasswordRequest = async data => {
-	try {
-		const response = await userInstance.put('/password', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async updateAccountRequest(data) {
+		try {
+			return await this.instance.put('/', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const changeStatusUsersRequest = async (id, data) => {
-	try {
-		const response = await userInstance.put(`/${id}/status`, data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async updatePasswordRequest(data) {
+		try {
+			return await this.instance.put('/password', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const deleteUserRequest = async id => {
-	try {
-		const response = await userInstance.delete(`/${id}`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async changeStatusRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}/status`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deleteRequest(id, data) {
+		try {
+			return await this.instance.delete(`/${id}`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deletePermanentRequest(id, data) {
+		try {
+			return await this.instance.delete(`/${id}/permanent`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async restoreRequest(id) {
+		try {
+			return await this.instance.put(`/${id}/restore`)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
 }
 

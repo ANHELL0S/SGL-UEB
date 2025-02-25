@@ -5,8 +5,8 @@ import { PasswordForm } from '../../components/Form/Account/PasswordForm'
 
 const AccountSection = () => {
 	const { userStore, loading, error } = useUserStore()
-	const [activeSection, setActiveSection] = useState('info')
 
+	const [activeSection, setActiveSection] = useState('info')
 	const handleTabClick = section => setActiveSection(section)
 
 	if (loading) return <div>Loading...</div>

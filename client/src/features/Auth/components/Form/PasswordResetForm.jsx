@@ -20,12 +20,13 @@ const PasswordResetForm = ({ decodedToken, token, onSuccess }) => {
 	})
 
 	const handleFormSubmit = async data => {
+		console.log(data)
 		setLoading(true)
 
 		try {
 			const response = await resetPasswordRequest(decodedToken.id, {
 				token,
-				newPassword: data.newPassword,
+				newPassword: data.newPassword, // Ensure data matches field names
 				confirmPassword: data.confirmPassword,
 			})
 
@@ -40,28 +41,47 @@ const PasswordResetForm = ({ decodedToken, token, onSuccess }) => {
 
 	return (
 		<form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-4'>
-			<div className='space-y-5'>
-				<InputFieldZod
-					label='Nueva contraseña'
-					type={showPassword ? 'text' : 'password'}
-					placeholder='Ingresa tu nueva contraseña'
-					register={register('newPassword')}
-					error={errors.newPassword}
-				/>
-				<InputFieldZod
-					label='Confirmar nueva contraseña'
-					type={showPassword ? 'text' : 'password'}
-					placeholder='Confirma tu nueva contraseña'
-					register={register('confirmPassword')}
-					error={errors.confirmPassword}
-				/>
+			<div className='space-y-5 text-sm'>
+				<div>
+					<label htmlFor='password' className='block font-medium text-slate-500'>
+						Nueva contraseña
+					</label>
+					<input
+						id='password'
+						type={showPassword ? 'text' : 'password'}
+						placeholder='********'
+						{...register('newPassword')}
+						className={`mt-1 block w-full px-3 py-2 border-2 ${
+							errors.newPassword ? 'border-red-500 placeholder:text-transparent' : 'border-slate-300'
+						} bg-slate-50 focus:outline-none focus:border-2 rounded-2xl focus:border-slate-500 transition-colors duration-300 text-slate-600`}
+					/>
+
+					{errors.password && <p className='text-red-500 text-xs mt-1'>{errors.password.message}</p>}
+				</div>
+
+				<div>
+					<label htmlFor='confirmPassword' className='block font-medium text-slate-500'>
+						Confirmar nueva contraseña
+					</label>
+					<input
+						id='confirmPassword'
+						type={showPassword ? 'text' : 'password'}
+						placeholder='********'
+						{...register('confirmPassword')}
+						className={`mt-1 block w-full px-3 py-2 border-2 ${
+							errors.confirmPassword ? 'border-red-500 placeholder:text-transparent' : 'border-slate-300'
+						} bg-slate-50 focus:outline-none focus:border-2 rounded-2xl focus:border-slate-500 transition-colors duration-300 text-slate-600`}
+					/>
+
+					{errors.confirmPassword && <p className='text-red-500 text-xs mt-1'>{errors.confirmPassword.message}</p>}
+				</div>
 			</div>
 
 			<div className='flex gap-4 flex-col'>
-				<Button type='submit' variant='primary' size='full' loading={loading}>
+				<Button type='submit' variant='primary' size='normal' loading={loading}>
 					{loading ? 'Procesando...' : 'Confirmar'}
 				</Button>
-				<Button type='button' variant='secondary' size='full' onClick={() => setShowPassword(!showPassword)}>
+				<Button type='button' variant='none' size='normal' onClick={() => setShowPassword(!showPassword)}>
 					{showPassword ? 'Ocultar Contraseñas' : 'Mostrar Contraseñas'}
 				</Button>
 			</div>

@@ -3,17 +3,26 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const env = {
+	// PRODUCTION - MAIN
 	MAIN_DB_HOST: process.env.MAIN_DB_HOST,
 	MAIN_DB_PORT: process.env.MAIN_DB_PORT,
 	MAIN_DB_NAME: process.env.MAIN_DB_NAME,
 	MAIN_DB_USER: process.env.MAIN_DB_USER,
 	MAIN_DB_PASSWORD: process.env.MAIN_DB_PASSWORD,
 
+	// LOCAL - MAIN
 	LOCAL_DB_HOST: process.env.LOCAL_DB_HOST,
 	LOCAL_DB_PORT: process.env.LOCAL_DB_PORT,
 	LOCAL_DB_NAME: process.env.LOCAL_DB_NAME,
 	LOCAL_DB_USER: process.env.LOCAL_DB_USER,
 	LOCAL_DB_PASSWORD: process.env.LOCAL_DB_PASSWORD,
+
+	// LOCAL - LOG
+	LOG_DB_HOST: process.env.LOG_DB_HOST,
+	LOG_DB_PORT: process.env.LOG_DB_PORT,
+	LOG_DB_NAME: process.env.LOG_DB_NAME,
+	LOG_DB_USER: process.env.LOG_DB_USER,
+	LOG_DB_PASSWORD: process.env.LOG_DB_PASSWORD,
 
 	REDIS_HOST: process.env.REDIS_HOST,
 	REDIS_PORT: process.env.REDIS_PORT,

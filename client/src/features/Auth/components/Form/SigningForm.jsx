@@ -13,12 +13,12 @@ const SigningForm = () => {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isValid },
 	} = useForm({
 		resolver: zodResolver(authSchema),
 	})
 
-	const handleFormSigninigSubmit = async data => {
+	const handleFormSigningSubmit = async data => {
 		setLoading(true)
 		try {
 			await signing(data.email, data.password)
@@ -29,28 +29,48 @@ const SigningForm = () => {
 	}
 
 	return (
-		<form onSubmit={handleSubmit(handleFormSigninigSubmit)}>
-			<div className='space-y-5'>
-				<InputFieldZod
-					label='Correo Electrónico'
-					type='email'
-					placeholder='Introduce tu correo'
-					register={register('email')}
-					error={errors.email}
-				/>
-				<InputFieldZod
-					label='Contraseña'
-					type='password'
-					placeholder='Introduce tu contraseña'
-					register={register('password')}
-					error={errors.password}
-				/>
-
-				<div className='flex justify-end gap-4'>
-					<Button type='submit' variant='primary' size='normal' loading={loading}>
-						{loading ? 'Cargando...' : 'Iniciar Sesión'}
-					</Button>
+		<form onSubmit={handleSubmit(handleFormSigningSubmit)}>
+			<div className='space-y-5 text-sm'>
+				<div>
+					<label htmlFor='email' className='block font-medium text-slate-500'>
+						E-mail
+					</label>
+					<input
+						id='email'
+						type='email'
+						placeholder='angelo@gmail.com'
+						{...register('email')}
+						className={`mt-1 block w-full px-3 py-2 border-2 ${
+							errors.email ? 'border-red-500 placeholder:text-transparent' : 'border-slate-300'
+						} bg-slate-50 focus:outline-none focus:border-2 rounded-2xl focus:border-slate-500 transition-colors duration-300 text-slate-600`}
+					/>
+					{errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email.message}</p>}
 				</div>
+
+				<div>
+					<label htmlFor='password' className='block font-medium text-slate-500'>
+						Contraseña
+					</label>
+					<input
+						id='password'
+						type='password'
+						placeholder='********'
+						{...register('password')}
+						className={`mt-1 block w-full px-3 py-2 border-2 ${
+							errors.password ? 'border-red-500 placeholder:text-transparent' : 'border-slate-300'
+						} bg-slate-50 focus:outline-none focus:border-2 rounded-2xl focus:border-slate-500 transition-colors duration-300 text-slate-600`}
+					/>
+					{errors.password && <p className='text-red-500 text-xs mt-1'>{errors.password.message}</p>}
+				</div>
+
+				<button
+					type='submit'
+					className={`p-3 font-medium text-white bg-slate-700 rounded-2xl shadow w-full transition-all duration-300 ${
+						!isValid || loading ? 'opacity-40 cursor-not-allowed' : 'hover:bg-slate-800'
+					}`}
+					disabled={!isValid || loading}>
+					{loading ? 'Cargando...' : 'Iniciar Sesión'}
+				</button>
 			</div>
 		</form>
 	)

@@ -1,85 +1,98 @@
+import { ApiService } from './_main'
 import { labInstance } from '../../config/instances'
 
-export const getAllLabsRequest = async (page, limit, search) => {
-	try {
-		const response = await labInstance.get('/', {
-			params: { page, limit, search },
-		})
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
-	}
-}
+export class LabService extends ApiService {
+	static instance = labInstance
 
-export const getLabByIdRequest = async id => {
-	try {
-		const response = await labInstance.get(`/${id}`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getAllRequest(page, limit, search) {
+		try {
+			const response = await this.instance.get('/', { params: { page, limit, search } })
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const findLabToNameRequest = async name => {
-	try {
-		const response = await labInstance.get(`/${name}/find-name`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getByIdRequest(id) {
+		try {
+			const response = await this.instance.get(`/${id}`)
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const createLabRequest = async data => {
-	try {
-		const response = await labInstance.post('/', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async findLabToNameRequest(id) {
+		try {
+			const response = await this.instance.get(`/${id}/find-name`)
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const updateLabRequest = async (id, data) => {
-	try {
-		const response = await labInstance.put(`/${id}`, data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async createRequest(data) {
+		try {
+			return await this.instance.post('/', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const createAssignLabAnalystRequest = async data => {
-	try {
-		const response = await labInstance.post('/assing-analyst', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async updateRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const changeStatusLabRequest = async (id, data) => {
-	try {
-		const response = await labInstance.put(`/${id}/status`, data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async createAssignLabAnalystRequest(data) {
+		try {
+			return await this.instance.post('/assing-analyst', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const deleteLabRequest = async id => {
-	try {
-		const response = await labInstance.delete(`/${id}`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async removeAnalystLabRequest(id) {
+		try {
+			return await this.instance.delete(`/${id}/assing-analyst`)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const removeAnalystLabRequest = async id => {
-	try {
-		const response = await labInstance.delete(`/${id}/assing-analyst`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async changeStatusRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}/status`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deleteLabRequest(id, data) {
+		try {
+			return await this.instance.delete(`/${id}`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deletePermanentLabRequest(id, data) {
+		try {
+			return await this.instance.delete(`/${id}/permanent`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async restoreLabRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}/restore`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
 }
 

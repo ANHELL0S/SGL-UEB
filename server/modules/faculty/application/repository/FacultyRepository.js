@@ -4,14 +4,16 @@ import { FacultyEntity } from '../../domain/entities/facultyEntity.js'
 export class FacultyRepository {
 	static async getAll() {
 		const dataFound = await faculty_Scheme.findAll({
+			paranoid: false,
 			include: [
 				{
 					model: career_Scheme,
+					paranoid: false,
 				},
 			],
 			subQuery: false,
 			distinct: true,
-			order: [['createdAt', 'DESC']],
+			order: [['updatedAt', 'DESC']],
 		})
 
 		return {
@@ -21,7 +23,7 @@ export class FacultyRepository {
 	}
 
 	static async getById(id) {
-		const dataFound = await faculty_Scheme.findByPk(id)
+		const dataFound = await faculty_Scheme.findByPk(id, { paranoid: false })
 		return new FacultyEntity(dataFound)
 	}
 }

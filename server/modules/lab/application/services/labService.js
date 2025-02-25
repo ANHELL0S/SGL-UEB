@@ -2,20 +2,6 @@ import { LabDTO } from '../../domain/dtos/labDTO.js'
 import { LabRepository } from '../repository/labRepository.js'
 
 export class LabService {
-	/*
-	static async getAllLabs(page, limit, search) {
-		const offset = (page - 1) * limit
-		const result = await LabRepository.findAllLabs(offset, limit, search)
-		return {
-			totalRecords: result.count,
-			totalPages: Math.ceil(result.count / limit),
-			currentPage: parseInt(page, 10),
-			recordsPerPage: parseInt(limit, 10),
-			labs: result.rows.map(lab => LabDTO.toResponse(lab)),
-		}
-	}
-	*/
-
 	static async getAllLabs(page, limit, search) {
 		const offset = limit ? (page - 1) * limit : null
 		const result = await LabRepository.findAllLabs(offset, limit, search)
@@ -66,10 +52,10 @@ export class LabService {
 	}
 
 	static async assignAnalystLab(data, transaction) {
-		const existingLab = await LabRepository.findLabById(data.id_lab)
+		const existingLab = await LabRepository.findLabById(data.lab)
 		if (!existingLab) return { status: 404, error: 'Laboratorio no encontrado.' }
 
-		await LabRepository.removeAssignAnalystLab(data.id_lab)
+		await LabRepository.removeAssignAnalystLab(data.lab)
 
 		const labData = LabDTO.assignAnalystLab({ ...data })
 		const assignAnalyst = await LabRepository.assignAnalystLab(labData, transaction)
@@ -96,12 +82,16 @@ export class LabService {
 	}
 
 	static async deleteLab(id, transaction) {
-		const labFound = await LabRepository.findLabById(id)
-		const associatedAccessLab = await LabRepository.findAccessLab(labFound.id_lab)
-		if (associatedAccessLab) return { error: 'Accesos asociados al laboratorio.' }
-		const associatedAnalysts = await LabRepository.findLaboratoryAnalyst(id)
-		if (associatedAnalysts) return { error: 'Analista responsable del laboratorio.' }
+		await LabRepository.updateLab(id, { active: false }, transaction)
+		return await LabRepository.deleteLab(id, transaction)
+	}
 
-		return LabRepository.deleteLab(id, transaction)
+	static async restoreLab(id, transaction) {
+		await LabRepository.updateLab(id, { active: true }, transaction)
+		return LabRepository.restoreLab(id, transaction)
+	}
+
+	static async deletePermanentLab(id, transaction) {
+		return LabRepository.deletePermanentLab(id, transaction)
 	}
 }

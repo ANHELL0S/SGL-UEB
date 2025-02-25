@@ -1,15 +1,12 @@
-// USERS GENERAL_ADMIN
-export const GOD = 'god@gmail.com'
-// USER DIRECTOR
-export const GALOP = 'galoP@gmail.com'
-export const FABIANB = 'fabianB@gmail.com'
-// USER SUPERVISOR
-export const ISABELP = 'isabelP@gmail.com'
-// USERS TECHNICAL_ANALYST
-export const MAFERQ = 'maferQ@gmail.com'
-export const ERIKAC = 'erikaC@gmail.com'
-export const PAOLAW = 'paolaW@gmail.com'
-export const SANTIAGOS = 'santiagoS@gmail.com'
-export const DERLYS = 'derlyS@gmail.com'
-// USER ACCESS_MANAGER
-export const ACCESO = 'acceso@gmail.com'
+export const CREDENTIALS = {
+	GOD_1: 'aangelogarcia2021@gmail.com',
+	GOD_2: 'csoto@mailes.ueb.edu.ec',
+	FABIANB: 'fbayas@ueb.edu.ec',
+	MAFERQ: 'mquinteros@ueb.edu.ec',
+	ERIKAC: 'ecortez@ueb.edu.ec',
+	PAOLAW: 'mwilcaso@ueb.edu.ec',
+	DERLYS: 'derly.silva@ueb.edu.ec',
+	ISABELP: 'manparedes@ueb.edu.ec',
+	SANTIAGOS: 'santiago.santos@ueb.edu.ec',
+	ANDRESO: 'andres.ordonez@ueb.edu.ec',
+}

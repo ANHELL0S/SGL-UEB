@@ -6,11 +6,12 @@ export class UserEntity {
 		email,
 		phone,
 		identification_card,
+		user_roles_intermediate,
 		password,
 		code,
 		createdAt,
 		updatedAt,
-		user_roles_intermediate,
+		deletedAt,
 	}) {
 		this.id = id_user
 		this.active = active
@@ -18,11 +19,12 @@ export class UserEntity {
 		this.email = email
 		this.phone = phone
 		this.identificationCard = identification_card
+		this.roles = this.processRoles(user_roles_intermediate)
 		this.password = password
 		this.code = code
 		this.createdAt = createdAt
 		this.updatedAt = updatedAt
-		this.roles = this.processRoles(user_roles_intermediate)
+		this.deletedAt = deletedAt
 	}
 
 	processRoles(user_roles_intermediate) {
@@ -58,6 +60,7 @@ export class UserEntity {
 			roles: this.roles,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
+			deletedAt: this.this.deletedAt,
 		}
 	}
 }

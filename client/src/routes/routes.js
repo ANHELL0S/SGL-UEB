@@ -18,6 +18,10 @@ const routes_auth = [
 
 const routes_privade = [
 	{
+		path: PATH_PRIVATE.LOGS,
+		element: lazy(() => import('../pages/Log/LogPage.jsx')),
+	},
+	{
 		path: PATH_PRIVATE.DASHBOARD,
 		element: lazy(() => import('../pages/Dashboard/DashboardPage.jsx')),
 	},
@@ -32,6 +36,10 @@ const routes_privade = [
 	{
 		path: PATH_PRIVATE.LAB,
 		element: lazy(() => import('../pages/Lab/LabPage.jsx')),
+	},
+	{
+		path: PATH_PRIVATE.LAB_ME,
+		element: lazy(() => import('../pages/Lab/LabMePage.jsx')),
 	},
 	{
 		path: PATH_PRIVATE.LAB_DETAIL,
@@ -57,16 +65,28 @@ const routes_privade = [
 		path: PATH_PRIVATE.REACTIVES,
 		element: lazy(() => import('../pages/Reactive/ReactivePage.jsx')),
 	},
+	{
+		path: PATH_PRIVATE.ACCESS_QUOTE,
+		element: lazy(() => import('../pages/Quote/QuotePage.jsx')),
+	},
+	{
+		path: PATH_PRIVATE.ACCESS_QUOTE_DETAIL,
+		element: lazy(() => import('../pages/Quote/QuoteDetailPage.jsx')),
+	},
+	{
+		path: PATH_PRIVATE.REPORT,
+		element: lazy(() => import('../pages/Report/ReportPage.jsx')),
+	},
+	{
+		path: PATH_PUBLIC.NOT_FOUND,
+		element: lazy(() => import('../pages/NotFound/NotFoundPage.jsx')),
+	},
 ]
 
 const routes_public = [
 	{
 		path: PATH_PUBLIC.ABOUT,
 		element: lazy(() => import('../pages/About/AboutPage.jsx')),
-	},
-	{
-		path: PATH_PUBLIC.NOT_FOUND,
-		element: lazy(() => import('../pages/NotFound/NotFoundPage.jsx')),
 	},
 ]
 

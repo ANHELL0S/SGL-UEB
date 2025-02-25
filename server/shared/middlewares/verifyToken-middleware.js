@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { env } from '../../config/env-config.js'
 import { token_Schema, user_Schema } from '../../schema/schemes.js'
-import { sendResponse } from '../../helpers/responseHandler-helper.js'
+import { sendResponse } from '../helpers/responseHandler-helper.js'
 
 export async function verifyToken(req, res, next) {
 	try {
@@ -13,7 +13,6 @@ export async function verifyToken(req, res, next) {
 				id_user_fk: req.params.id,
 				used: false,
 			},
-			order: [['createdAt', 'DESC']],
 		})
 
 		if (!tokenInDb) return sendResponse(res, 401, 'Token inválido o ya utilizado.')

@@ -17,7 +17,8 @@ const LabDetailPage = () => {
 
 	if (error) return <p className='text-sm text-red-500'>Error: {error}</p>
 
-	const roleAccept = userRoles.some(userRole => userRole.type === ROLES.SUPERVISOR)
+	const rolesAccepted = [ROLES.GENERAL_ADMIN, ROLES.SUPERVISOR]
+	const roleAccept = userRoles.some(userRole => rolesAccepted.includes(userRole.type))
 
 	return (
 		<PrivateLayout hasAccess={roleAccept}>

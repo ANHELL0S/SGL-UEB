@@ -10,17 +10,17 @@ export class LabEntity {
 		this.totalAccess = this.access.length
 		this.updatedAt = lab.updatedAt
 		this.createdAt = lab.createdAt
+		this.deletedAt = lab.deletedAt
 	}
 
 	processAnalysts(analysts) {
 		return analysts?.user?.full_name
 	}
 
-	processAccess(accessData) {
+	processAccess(access_labs) {
 		return (
-			accessData?.map(access => ({
-				id_access_lab: access.id_access_lab,
-				code: access.code,
+			access_labs?.map(access => ({
+				data: access,
 			})) ?? []
 		)
 	}
@@ -41,6 +41,7 @@ export class LabEntity {
 			totalAccess: this.totalAccess,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
+			deletedAt: this.deletedAt,
 		}
 	}
 }

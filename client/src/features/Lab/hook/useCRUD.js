@@ -16,7 +16,9 @@ const useCrud = () => {
 
 export const useCreated = () => useCrud()
 export const useUpdated = () => useCrud()
-export const useDelete = () => useCrud()
+export const useDeleted = () => useCrud()
+export const useDeletedPermanent = () => useCrud()
+export const useRestored = () => useCrud()
 export const useActived = () => useCrud()
 export const useDesactived = () => useCrud()
 export const useAssignAnalyst = () => useCrud()

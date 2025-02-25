@@ -15,15 +15,23 @@ export const AuthProvider = ({ children }) => {
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
-		const isAuthenticatedInStorage = localStorage.getItem('isAuthenticated') === 'true'
+		const checkAuthentication = async () => {
+			try {
+				const isAuthenticatedInStorage = localStorage.getItem('isAuthenticated') === 'true'
 
-		if (!isAuthenticatedInStorage) {
-			localStorage.removeItem('isAuthenticated')
-			closeRequest()
+				if (!isAuthenticatedInStorage) {
+					localStorage.removeItem('isAuthenticated')
+					await closeRequest() // Assuming closeRequest is defined elsewhere
+				}
+
+				setIsAuthenticated(isAuthenticatedInStorage)
+			} catch (error) {
+				console.error('Error checking authentication:', error)
+			} finally {
+				setLoading(false)
+			}
 		}
-
-		setIsAuthenticated(isAuthenticatedInStorage)
-		setLoading(false)
+		checkAuthentication()
 	}, [])
 
 	const signing = async (email, password) => {
@@ -58,7 +66,8 @@ export const AuthProvider = ({ children }) => {
 		} catch (error) {
 		} finally {
 			setIsAuthenticated(false)
-			localStorage.setItem('isAuthenticated', 'false')
+			localStorage.removeItem('isAuthenticated')
+			ToastGeneric({ type: 'info', message: 'Sesión cerrado exitosamente.' })
 		}
 	}
 

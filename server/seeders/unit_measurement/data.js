@@ -30,10 +30,6 @@ export const units_measurement = [
 		unit: REACTIVE_UNIT.MASA.DECAGRAMO,
 	},
 	{
-		name: 'Centigramos',
-		unit: REACTIVE_UNIT.MASA.MICROGRAMO,
-	},
-	{
 		name: 'Onza',
 		unit: REACTIVE_UNIT.MASA.DECAGRAMO,
 	},

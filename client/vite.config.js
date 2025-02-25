@@ -1,7 +1,13 @@
+import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
 	plugins: [react()],
-	base: '/', // Ensure the base path is set correctly for routing
+	base: '/', // Asegura que la base path esté configurada correctamente para el enrutamiento
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, './src'),
+		},
+	},
 })

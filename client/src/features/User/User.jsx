@@ -5,11 +5,28 @@ import { Button } from '../../components/Button/Button'
 import { NotFound } from '../../components/Banner/NotFound'
 import { ReportModal } from './components/Modal/ModalReport'
 import { SpinnerLoading } from '../../components/Loaders/SpinnerLoading'
-import { useActived, useAssignRole, useCreated, useDelete, useDesactived, useUpdated } from './hook/useCRUD'
+import {
+	useActived,
+	useAssignRole,
+	useCreated,
+	useDelete,
+	useDesactived,
+	useRestored,
+	useUpdated,
+	useDeletePermanent,
+} from './hook/useCRUD'
 import { useDropdown } from './hook/useDropdown'
 import { useSelected } from './hook/useSelected'
 import { BiCaretLeft, BiCaretRight, BiX } from 'react-icons/bi'
-import { ModalActive, ModalCreate, ModalDelete, ModalDesactive, ModalUpdate } from './components/Form/UserCRUD'
+import {
+	ModalActive,
+	ModalCreate,
+	ModalDelete,
+	ModalDesactive,
+	ModalUpdate,
+	ModalDeletePermanent,
+	ModalRestore,
+} from './components/Form/UserCRUD'
 import { LuArchive, LuSearch } from 'react-icons/lu'
 import { Status500 } from '../../components/Banner/StatusServer'
 import { UserTable } from './components/Table/UserTable'
@@ -88,6 +105,26 @@ const UserSection = () => {
 		toggleDropdown(null)
 	}
 
+	// RESTORED
+	const { isVisible: showRestoredModal, openModal: handleRestored, closeModal: toggleRestoredModal } = useRestored()
+	const handleOpenRestoredModal = data => {
+		setSelected(data)
+		handleRestored(data)
+		toggleDropdown(null)
+	}
+
+	// DELETED PERMANENT
+	const {
+		isVisible: showDeletedPermanentModal,
+		openModal: handleDeletedPermanent,
+		closeModal: toggleDeletedPermanentModal,
+	} = useDeletePermanent()
+	const handleOpenDeletedPermanentModal = data => {
+		setSelected(data)
+		handleDeletedPermanent(data)
+		toggleDropdown(null)
+	}
+
 	// REPORT
 	const [showReportModal, setShowReportModal] = useState(false)
 	const toggleReportModal = () => setShowReportModal(!showReportModal)
@@ -112,7 +149,7 @@ const UserSection = () => {
 				: {
 						icon: <LuSearch size={50} />,
 						title: 'Sin resultados',
-						description: 'Lo sentimos, no se encontrarón usuarios que coincidan con tu búsqueda.',
+						description: 'Lo sentimos, no se encontrarón coincidencias.',
 					}
 			return (
 				<div className='flex justify-center py-32'>
@@ -128,8 +165,10 @@ const UserSection = () => {
 				dropdownVisible={dropdownVisible}
 				handleOpenUpdatedModal={handleOpenUpdatedModal}
 				handleOpenActivedModal={handleOpenActivedModal}
-				handleOpenDeletedModal={handleOpenDeletedModal}
 				handleOpenDesactivedModal={handleOpenDesactivedModal}
+				handleOpenDeletedModal={handleOpenDeletedModal}
+				handleOpenRestoredModal={handleOpenRestoredModal}
+				handleOpenDeletedPermanentModal={handleOpenDeletedPermanentModal}
 				handleOpenAssignRoleModal={handleOpenAssignRoleModal}
 			/>
 		)
@@ -168,9 +207,6 @@ const UserSection = () => {
 
 					<div className='flex items-center justify-between gap-4 flex-wrap lg:flex-nowrap'>
 						<div className='flex gap-4 flex-wrap'>
-							<Button variant='secondary' size='small'>
-								Reporte
-							</Button>
 							<Button variant='primary' size='small' onClick={() => handleOpenCreatedModal()}>
 								Nuevo usuario
 							</Button>
@@ -251,6 +287,10 @@ const UserSection = () => {
 			{showActivedModal && <ModalActive user={selected} onClose={toggleActivedModal} onSuccess={fetchUsers} />}
 			{showDesactivedModal && <ModalDesactive user={selected} onClose={toggleDesactivedModal} onSuccess={fetchUsers} />}
 			{showDeletedModal && <ModalDelete user={selected} onClose={toggleDeletedModal} onSuccess={fetchUsers} />}
+			{showRestoredModal && <ModalRestore user={selected} onClose={toggleRestoredModal} onSuccess={fetchUsers} />}
+			{showDeletedPermanentModal && (
+				<ModalDeletePermanent user={selected} onClose={toggleDeletedPermanentModal} onSuccess={fetchUsers} />
+			)}
 			{showReportModal && <ReportModal onClose={toggleReportModal} />}
 		</>
 	)

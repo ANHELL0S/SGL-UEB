@@ -1,9 +1,9 @@
 export const translateAccess = typeAccess => {
 	switch (typeAccess) {
 		case 'access_internal':
-			return 'Interno'
+			return 'Investifación'
 		case 'access_external':
-			return 'Externo'
+			return 'Servicio'
 		default:
 			return 'Tipo de acceso desconocido'
 	}

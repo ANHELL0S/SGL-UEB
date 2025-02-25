@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import {
-	getAccessLabByIdRequest,
-	getAllAccessLabsRequest,
-	getAllAccessPertainLabRequest,
-} from '../services/api/accessLab.api'
+import { AccessService } from '../services/api/accessLab.api'
 
 export const useAccessLabStore = id => {
-	const [data, setData] = useState(null)
+	const [accessData, setAccessData] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState(null)
 
@@ -14,10 +10,10 @@ export const useAccessLabStore = id => {
 		const fetchData = async () => {
 			try {
 				setLoading(true)
-				const response = await getAccessLabByIdRequest(id)
-				setData(response.data)
+				const response = await AccessService.getByIdRequest(id)
+				setAccessData(response.data)
 			} catch (error) {
-				setError(error.message)
+				setError(error)
 			} finally {
 				setLoading(false)
 			}
@@ -26,7 +22,32 @@ export const useAccessLabStore = id => {
 		fetchData()
 	}, [id])
 
-	return { data, loading, error }
+	return { accessData, loading, error }
+}
+
+export const useAccessByCodeQuoteStore = code => {
+	const [accessData, setAccessData] = useState(null)
+	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState(null)
+
+	const fetchData = useCallback(async () => {
+		try {
+			setLoading(true)
+			const response = await AccessService.getByCodeRequest(code)
+			setAccessData(response.data)
+			setError(null)
+		} catch (error) {
+			setError(error)
+		} finally {
+			setLoading(false)
+		}
+	}, [code])
+
+	useEffect(() => {
+		fetchData()
+	}, [fetchData])
+
+	return { accessData, loading, error, reloadAccess: fetchData }
 }
 
 export const useAllAccessLabsStore = (limit_record = 10) => {
@@ -47,8 +68,8 @@ export const useAllAccessLabsStore = (limit_record = 10) => {
 	const fetchAccessLabs = useCallback(async () => {
 		setLoading(true)
 		try {
-			const data = await getAllAccessLabsRequest(page, limit, debouncedSearch)
-			setAccessLabs(data)
+			const response = await AccessService.getAllRequest(page, limit, debouncedSearch)
+			setAccessLabs(response.data)
 		} catch (error) {
 			setError(error.message)
 		} finally {
@@ -60,8 +81,8 @@ export const useAllAccessLabsStore = (limit_record = 10) => {
 		fetchAccessLabs()
 	}, [fetchAccessLabs, page, limit])
 
-	const accessLabData = accessLabs?.data?.access_labs || []
-	const totalRecords = accessLabs?.data?.totalRecords || 0
+	const accessLabData = accessLabs?.access_labs || []
+	const totalRecords = accessLabs?.totalRecords || 0
 	const totalPages = Math.ceil(totalRecords / limit)
 
 	useEffect(() => {
@@ -116,8 +137,8 @@ export const useAllAccessPertainLabStore = (id, limit_record = 10) => {
 	const fetchAccessPertainLab = useCallback(async () => {
 		setLoading(true)
 		try {
-			const data = await getAllAccessPertainLabRequest(id, page, limit, search)
-			setAccessPertainLab(data)
+			const response = await AccessService.getAllAccessPertainLabRequest(id, page, limit, search)
+			setAccessPertainLab(response)
 		} catch (error) {
 			setError(error.message)
 		} finally {

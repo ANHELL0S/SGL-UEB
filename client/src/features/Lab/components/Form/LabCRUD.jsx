@@ -1,16 +1,11 @@
 import { useState } from 'react'
 import { ModalAction } from '../Modal/ActionModal'
 import { ToastGeneric } from '../../../../components/Toasts/Toast'
-import {
-	createLabRequest,
-	updateLabRequest,
-	deleteLabRequest,
-	changeStatusLabRequest,
-	removeAnalystLabRequest,
-} from '../../../../services/api/lab.api'
+import { LabService } from '../../../../services/api/lab.api'
 import { LabForm } from './LabForm'
+import { AssignAnalystForm } from './AssignAnalystForm'
 
-export const ModalCreate = ({ onClose, onCreate }) => {
+export const ModalCreate = ({ onClose, onSuccess }) => {
 	const [loading, setLoading] = useState(false)
 	const [formData, setFormData] = useState({
 		name: '',
@@ -29,10 +24,10 @@ export const ModalCreate = ({ onClose, onCreate }) => {
 	const handleSubmit = async data => {
 		setLoading(true)
 		try {
-			const response = await createLabRequest(data)
-			ToastGeneric({ type: 'success', message: response.message })
-			onCreate()
+			const response = await LabService.createRequest(data)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
+			onSuccess()
 		} catch (error) {
 			ToastGeneric({ type: 'error', message: error.message })
 		} finally {
@@ -77,8 +72,8 @@ export const ModalUpdate = ({ lab, onClose, onSuccess }) => {
 	const handleSubmit = async data => {
 		setLoading(true)
 		try {
-			const response = await updateLabRequest(lab?.id_lab, data)
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await LabService.updateRequest(lab?.id_lab, data)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -112,8 +107,8 @@ export const ModalDesactive = ({ lab, onClose, onSuccess }) => {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			const response = await changeStatusLabRequest(lab.id_lab, { active: lab.active })
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await LabService.changeStatusRequest(lab.id_lab, { active: lab.active })
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -149,8 +144,8 @@ export const ModalActive = ({ lab, onClose, onSuccess }) => {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			const response = await changeStatusLabRequest(lab.id_lab, { active: lab.active })
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await LabService.changeStatusRequest(lab.id_lab, { active: lab.active })
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -186,8 +181,8 @@ export const ModalDelete = ({ lab, onClose, onSuccess }) => {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			const response = await deleteLabRequest(lab.id_lab)
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await LabService.deleteLabRequest(lab.id_lab)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -200,6 +195,8 @@ export const ModalDelete = ({ lab, onClose, onSuccess }) => {
 	const modalProps = {
 		text: {
 			title: 'Eliminar laboratorio',
+			delete:
+				'Esta acción no eliminará permanentemente el laboratorio, sino que lo marcará como eliminado. Puedes restaurarlo en cualquier momento.',
 			description_a: `Estás a punto de eliminar al laboratorio`,
 			description_b: `${lab.name}`,
 			description_c: '¿Está seguro?',
@@ -216,6 +213,130 @@ export const ModalDelete = ({ lab, onClose, onSuccess }) => {
 	return <ModalAction {...modalProps} />
 }
 
+export const ModalDeletePermanent = ({ lab, onClose, onSuccess }) => {
+	const [loading, setLoading] = useState(false)
+
+	const handleSubmit = async e => {
+		e.preventDefault()
+		setLoading(true)
+		try {
+			const response = await LabService.deletePermanentLabRequest(lab.id_lab)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
+			onClose()
+			onSuccess()
+		} catch (error) {
+			ToastGeneric({ type: 'error', message: error.message })
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const modalProps = {
+		text: {
+			title: 'Eliminado permanente',
+			delete: 'Esta acción eliminará permanentemente el registro, y todas sus interacciones.',
+			description_a: `Estás a punto de eliminar al laboratorio`,
+			description_b: `${lab.name}`,
+			description_c: '¿Está seguro?',
+			buttonCancel: 'No, mantenlo',
+			buttonSubmit: 'Ok, eliminar',
+			buttonLoading: 'Eliminando laboratorio...',
+		},
+		actionType: 'danger',
+		loading,
+		onClose,
+		onSubmit: handleSubmit,
+	}
+
+	return <ModalAction {...modalProps} />
+}
+
+export const ModalRestore = ({ lab, onClose, onSuccess }) => {
+	const [loading, setLoading] = useState(false)
+
+	const handleSubmit = async e => {
+		e.preventDefault()
+		setLoading(true)
+		try {
+			const response = await LabService.restoreLabRequest(lab.id_lab)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
+			onClose()
+			onSuccess()
+		} catch (error) {
+			ToastGeneric({ type: 'error', message: error.message })
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const modalProps = {
+		text: {
+			title: 'Restaurar laboratorio',
+			description_a: `Estás a punto de restaurar al laboratorio`,
+			description_b: `${lab.name}`,
+			description_c: '¿Está seguro?',
+			buttonCancel: 'No, mantenlo',
+			buttonSubmit: 'Ok, restaurar',
+			buttonLoading: 'Restaurando laboratorio...',
+		},
+		actionType: 'success',
+		loading,
+		onClose,
+		onSubmit: handleSubmit,
+	}
+
+	return <ModalAction {...modalProps} />
+}
+
+export const ModalAssignedAnalyst = ({ lab, onClose, onSuccess }) => {
+	const [loading, setLoading] = useState(false)
+	const [formData, setFormData] = useState({
+		user: '',
+	})
+
+	const handleChange = e => {
+		const { name, value } = e.target
+		setFormData(prevData => ({
+			...prevData,
+			[name]: value,
+		}))
+	}
+
+	const handleSubmit = async data => {
+		const newData = {
+			...data,
+			lab: lab.id_lab,
+		}
+		setLoading(true)
+		try {
+			const response = await LabService.createAssignLabAnalystRequest(newData)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
+			onClose()
+			onSuccess()
+		} catch (error) {
+			ToastGeneric({ type: 'error', message: error.message })
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const modalProps = {
+		text: {
+			title: 'Asignar análista',
+			buttonSubmit: 'Ok, asignar análista',
+			buttonLoading: 'Asignando análista...',
+			buttonCancel: 'No, cancelar',
+		},
+		loading,
+		formData,
+		onClose,
+		onChange: handleChange,
+		onSubmit: handleSubmit,
+	}
+
+	return <AssignAnalystForm {...modalProps} />
+}
+
 export const ModalAnalystDelete = ({ lab, onClose, onSuccess }) => {
 	const [loading, setLoading] = useState(false)
 
@@ -223,8 +344,8 @@ export const ModalAnalystDelete = ({ lab, onClose, onSuccess }) => {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			const response = await removeAnalystLabRequest(lab.id_lab)
-			ToastGeneric({ type: 'success', message: response.message })
+			const response = await LabService.removeAnalystLabRequest(lab.id_lab)
+			ToastGeneric({ type: 'success', message: response?.data?.message })
 			onClose()
 			onSuccess()
 		} catch (error) {

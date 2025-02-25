@@ -5,8 +5,8 @@ export const params_schema_zod = z.object({
 })
 
 export const assign_analyst_lab_zod = z.object({
-	id_user: z.string().uuid({ message: 'ID no válida.' }),
-	id_lab: z.string().uuid({ message: 'ID no válida.' }),
+	user: z.string().uuid({ message: 'ID no válida.' }),
+	lab: z.string().uuid({ message: 'ID no válida.' }),
 })
 
 export const lab_schema_zod = z.object({

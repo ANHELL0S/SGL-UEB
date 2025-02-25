@@ -6,7 +6,7 @@ export class RoleRepository {
 		const rolesFound = await rol_Schema.findAll({
 			subQuery: false,
 			distinct: true,
-			order: [['createdAt', 'DESC']],
+			order: [['updatedAt', 'DESC']],
 		})
 
 		return rolesFound ? new roleEntity(rolesFound) : null

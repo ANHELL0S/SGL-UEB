@@ -1,12 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import React, { useCallback, useEffect, useState } from 'react'
 import { ToastGeneric } from '../components/Toasts/Toast'
-import {
-	getInfoUserRequest,
-	getAllUsersRequest,
-	updateAccountRequest,
-	deleteUserRequest,
-} from '../services/api/user.api'
+import { UserService } from '../services/api/user.api'
 
 export const useUserStore = () => {
 	const { isAuthenticated } = useAuth()
@@ -22,7 +17,7 @@ export const useUserStore = () => {
 		setLoading(true)
 		setError(null)
 		try {
-			const data = await getInfoUserRequest()
+			const data = await UserService.getInfoUserRequest()
 			setUserStore(data)
 		} catch (err) {
 			setError(err)
@@ -46,18 +41,24 @@ export const useAllUsersStore = (limit_record = 10) => {
 	const [page, setPage] = useState(1)
 	const [limit, setLimit] = useState(limit_record)
 	const [search, setSearch] = useState('')
+	const [debouncedSearch, setDebouncedSearch] = useState(search)
+
+	useEffect(() => {
+		const handler = setTimeout(() => setDebouncedSearch(search), 500)
+		return () => clearTimeout(handler)
+	}, [search])
 
 	const fetchUsers = useCallback(async () => {
 		setLoading(true)
 		try {
-			const data = await getAllUsersRequest(page, limit, search)
-			setUsers(data)
+			const response = await UserService.getAllRequest(page, limit, debouncedSearch)
+			setUsers(response)
 		} catch (error) {
 			setError(error.message)
 		} finally {
 			setLoading(false)
 		}
-	}, [page, limit, search])
+	}, [page, limit, debouncedSearch])
 
 	useEffect(() => {
 		fetchUsers()
@@ -110,7 +111,7 @@ export const useAllUsersStore = (limit_record = 10) => {
 export const useUpdateAccount = () => {
 	const updateAccount = async data => {
 		try {
-			const response = await updateAccountRequest(data)
+			const response = await UserService.updateAccountRequest(data)
 			ToastGeneric({ type: 'success', message: response.message })
 			return response
 		} catch (error) {
@@ -125,7 +126,7 @@ export const useUpdateAccount = () => {
 export const useDeleteUser = () => {
 	const updateAccount = async id => {
 		try {
-			const response = await deleteUserRequest(id)
+			const response = await UserService.deleteRequest(id)
 			ToastGeneric({ type: 'success', message: response.message })
 			return response
 		} catch (error) {

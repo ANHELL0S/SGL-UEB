@@ -5,6 +5,8 @@ import {
 	ModalUpdate,
 	ModalPending,
 	ModalRejected,
+	ModalRestore,
+	ModalDeletePermanent,
 } from './components/Form/AccessLabCRUD'
 import { useDropdown } from './hook/useDropdown'
 import { useSelected } from './hook/useSelected'
@@ -18,7 +20,16 @@ import { BiCaretLeft, BiCaretRight, BiX } from 'react-icons/bi'
 import { Status500 } from '../../components/Banner/StatusServer'
 import { useAllAccessLabsStore } from '../../hooks/useAccessLab'
 import { SpinnerLoading } from '../../components/Loaders/SpinnerLoading'
-import { useApproved, useCreated, useDelete, usePending, useQuoted, useRejected, useUpdated } from './hook/useCRUD'
+import {
+	useApproved,
+	useCreated,
+	useDeleted,
+	usePending,
+	useRejected,
+	useRestored,
+	useUpdated,
+	useDeletedPermanent,
+} from './hook/useCRUD'
 
 export const AccessLabSection = () => {
 	const {
@@ -54,14 +65,6 @@ export const AccessLabSection = () => {
 		toggleDropdown(null)
 	}
 
-	// ADD QUOTE
-	const { isVisible: showQuotedModal, openModal: handleQuoted, closeModal: toggleQuotedModal } = useQuoted()
-	const handleOpenQuotedModal = data => {
-		setSelected(data)
-		handleQuoted(data)
-		toggleDropdown(null)
-	}
-
 	// APPROVED
 	const { isVisible: showApprovedModal, openModal: handleApproved, closeModal: toggleApprovedModal } = useApproved()
 	const handleOpenApprovedModal = data => {
@@ -87,10 +90,30 @@ export const AccessLabSection = () => {
 	}
 
 	// DELETED
-	const { isVisible: showDeletedModal, openModal: handleDeleted, closeModal: toggleDeletedModal } = useDelete()
+	const { isVisible: showDeletedModal, openModal: handleDeleted, closeModal: toggleDeletedModal } = useDeleted()
 	const handleOpenDeletedModal = data => {
 		setSelected(data)
 		handleDeleted(data)
+		toggleDropdown(null)
+	}
+
+	// RESTORED
+	const { isVisible: showRestoredModal, openModal: handleRestored, closeModal: toggleRestoredModal } = useRestored()
+	const handleOpenRestoredModal = data => {
+		setSelected(data)
+		handleRestored(data)
+		toggleDropdown(null)
+	}
+
+	// DELETED PERMANENT
+	const {
+		isVisible: showDeletedPermanentModal,
+		openModal: handleDeletedPermanent,
+		closeModal: toggleDeletedPermanentModal,
+	} = useDeletedPermanent()
+	const handleOpenDeletedPermanentModal = data => {
+		setSelected(data)
+		handleDeletedPermanent(data)
 		toggleDropdown(null)
 	}
 
@@ -110,7 +133,7 @@ export const AccessLabSection = () => {
 				? {
 						icon: <LuArchive size={50} />,
 						title: 'Sin registros',
-						description: 'Lo sentimos, no se encontró ningún acceso a laboratorios.',
+						description: 'Lo sentimos, no se encontró ningún acceso.',
 					}
 				: {
 						icon: <LuSearch size={50} />,
@@ -132,6 +155,8 @@ export const AccessLabSection = () => {
 				handleOpenPendingModal={handleOpenPendingModal}
 				handleOpenRejectedModal={handleOpenRejectedModal}
 				handleOpenDeletedModal={handleOpenDeletedModal}
+				handleOpenRestoredModal={handleOpenRestoredModal}
+				handleOpenDeletedPermanentModal={handleOpenDeletedPermanentModal}
 				userRoles={userRoles}
 				ROLES={ROLES}
 				dropdownVisible={dropdownVisible}
@@ -144,7 +169,7 @@ export const AccessLabSection = () => {
 		<>
 			<main className='space-y-4'>
 				<section className='text-2xl dark:text-gray-200 text-slate-600 font-semibold relative flex items-center gap-2'>
-					<h1>Accesos</h1>
+					<h1>Investigaciones</h1>
 				</section>
 
 				<section className='flex items-center justify-between flex-wrap lg:flex-nowrap'>
@@ -152,7 +177,7 @@ export const AccessLabSection = () => {
 						<input
 							type='text'
 							placeholder='Buscar...'
-							className='p-1.5 pl-8 pr-10 border-2 border-gray-300 rounded-lg bg-white text-gray-700 placeholder-gray-400 font-medium text-sm w-full focus:outline-none focus:ring-transparent focus:ring-slate-500 focus:border-slate-500 dar:focus:ring-gray-500 dark:focus:border-gray-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500'
+							className='p-1.5 pl-8 pr-10 border-2 border-gray-300 rounded-lg bg-white text-gray-700 placeholder-gray-400 font-medium text-sm w-48 focus:outline-none focus:ring-transparent focus:ring-slate-500 focus:border-slate-500 dar:focus:ring-gray-500 dark:focus:border-gray-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500'
 							value={search}
 							onChange={handleSearchChange}
 							onKeyDown={handleKeyDown}
@@ -173,12 +198,9 @@ export const AccessLabSection = () => {
 
 					<div className='flex items-center justify-between gap-4 flex-wrap lg:flex-nowrap'>
 						<div className='flex gap-4 flex-wrap'>
-							<Button variant='secondary' size='small'>
-								Reporte
-							</Button>
 							{userRoles.some(userRole => userRole.type === ROLES.ACCESS_MANAGER) && (
 								<Button variant='primary' size='small' onClick={() => handleOpenCreatedModal()}>
-									Nuevo acceso
+									Nueva investigación
 								</Button>
 							)}
 						</div>
@@ -188,7 +210,7 @@ export const AccessLabSection = () => {
 				<section className='space-y-4'>
 					<div className='flex items-center gap-4 w-full flex-wrap justify-between text-xs text-slate-500 dark:text-gray-300 font-semibold dark:bg-gray-700/40 bg-slate-100 p-2 rounded-lg'>
 						<div className='flex items-center space-x-1'>
-							<div className='flex text-slate-500 text-xs pr-2 dark:text-slate-200 w-full sm:w-auto'>
+							<div className='flex text-slate-500 text-xs pr-2 dark:text-slate-200 sm:w-auto'>
 								<button
 									onClick={() => handlePageChange(page - 1)}
 									disabled={!totalRecords || page === 1}
@@ -217,6 +239,7 @@ export const AccessLabSection = () => {
 									<BiCaretRight size={16} />
 								</button>
 							</div>
+
 							<div className='border-l pl-4 dark:border-gray-600'>
 								<span>
 									{totalPages && totalRecords
@@ -254,7 +277,6 @@ export const AccessLabSection = () => {
 			{showUpdatedModal && (
 				<ModalUpdate accessLab={selected} onClose={toggleUpdatedModal} onSuccess={fetchAccessLabs} />
 			)}
-			{showQuotedModal && <ModalQuote accessLab={selected} onClose={toggleQuotedModal} onSuccess={fetchAccessLabs} />}
 			{showDeletedModal && (
 				<ModalDelete accessLab={selected} onClose={toggleDeletedModal} onSuccess={fetchAccessLabs} />
 			)}
@@ -266,6 +288,12 @@ export const AccessLabSection = () => {
 			)}
 			{showRejectedModal && (
 				<ModalRejected accessLab={selected} onClose={toggleRejectedModal} onSuccess={fetchAccessLabs} />
+			)}
+			{showRestoredModal && (
+				<ModalRestore accessLab={selected} onClose={toggleRestoredModal} onSuccess={fetchAccessLabs} />
+			)}
+			{showDeletedPermanentModal && (
+				<ModalDeletePermanent accessLab={selected} onClose={toggleDeletedPermanentModal} onSuccess={fetchAccessLabs} />
 			)}
 		</>
 	)

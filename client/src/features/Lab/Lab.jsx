@@ -3,7 +3,9 @@ import {
 	useActived,
 	useAssignAnalyst,
 	useCreated,
-	useDelete,
+	useDeleted,
+	useDeletedPermanent,
+	useRestored,
 	useDesactived,
 	useRemoveAnalyst,
 	useUpdated,
@@ -14,7 +16,10 @@ import {
 	ModalDelete,
 	ModalDesactive,
 	ModalAnalystDelete,
+	ModalAssignedAnalyst,
 	ModalUpdate,
+	ModalDeletePermanent,
+	ModalRestore,
 } from './components/Form/LabCRUD'
 import { useSelected } from './hook/useSelected'
 import { useDropdown } from './hook/useDropdown'
@@ -108,10 +113,30 @@ export const LabSection = () => {
 	}
 
 	// DELETED
-	const { isVisible: showDeletedModal, openModal: handleDeleted, closeModal: toggleDeletedModal } = useDelete()
+	const { isVisible: showDeletedModal, openModal: handleDeleted, closeModal: toggleDeletedModal } = useDeleted()
 	const handleOpenDeletedModal = data => {
 		setSelected(data)
 		handleDeleted(data)
+		toggleDropdown(null)
+	}
+
+	// RESTORED
+	const { isVisible: showRestoredModal, openModal: handleRestored, closeModal: toggleRestoredModal } = useRestored()
+	const handleOpenRestoredModal = data => {
+		setSelected(data)
+		handleRestored(data)
+		toggleDropdown(null)
+	}
+
+	// DELETED PERMANENT
+	const {
+		isVisible: showDeletedPermanentModal,
+		openModal: handleDeletedPermanent,
+		closeModal: toggleDeletedPermanentModal,
+	} = useDeletedPermanent()
+	const handleOpenDeletedPermanentModal = data => {
+		setSelected(data)
+		handleDeletedPermanent(data)
 		toggleDropdown(null)
 	}
 
@@ -139,7 +164,7 @@ export const LabSection = () => {
 				: {
 						icon: <LuSearch size={50} />,
 						title: 'Sin resultados',
-						description: 'Lo sentimos, no se encontrarón laboratorios que coincidan con tu búsqueda.',
+						description: 'Lo sentimos, no se encontrarón coincidencias.',
 					}
 			return (
 				<div className='flex justify-center py-32'>
@@ -156,6 +181,8 @@ export const LabSection = () => {
 				handleOpenUpdatedModal={handleOpenUpdatedModal}
 				handleOpenActivedModal={handleOpenActivedModal}
 				handleOpenDeletedModal={handleOpenDeletedModal}
+				handleOpenRestoredModal={handleOpenRestoredModal}
+				handleOpenDeletedPermanentModal={handleOpenDeletedPermanentModal}
 				handleOpenDesactivedModal={handleOpenDesactivedModal}
 				handleOpenRemoveAnalystModal={handleOpenRemoveAnalystModal}
 				handleOpenAssignAnalystModal={handleOpenAssignAnalystModal}
@@ -165,17 +192,17 @@ export const LabSection = () => {
 
 	return (
 		<>
-			<main className='space-y-4'>
+			<main className='space-y-4 overflow-auto'>
 				<section className='text-2xl dark:text-gray-200 text-slate-600 font-semibold relative flex items-center gap-2'>
 					<h1>Laboratorios</h1>
 				</section>
 
-				<section className='flex items-center justify-between flex-wrap lg:flex-nowrap'>
+				<section className='flex items-center justify-between sm:flex-wrap lg:flex-nowrap'>
 					<div className='relative group'>
 						<input
 							type='text'
 							placeholder='Buscar...'
-							className='p-1.5 pl-8 pr-10 border-2 border-gray-300 rounded-lg bg-white text-gray-700 placeholder-gray-400 font-medium text-sm w-full focus:outline-none focus:ring-transparent focus:ring-slate-500 focus:border-slate-500 dar:focus:ring-gray-500 dark:focus:border-gray-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500'
+							className='p-1.5 pl-8 pr-10 border-2 border-gray-300 rounded-lg bg-white text-gray-700 placeholder-gray-400 font-medium text-sm w-48 focus:outline-none focus:ring-transparent focus:ring-slate-500 focus:border-slate-500 dar:focus:ring-gray-500 dark:focus:border-gray-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500'
 							value={search}
 							onChange={handleSearchChange}
 							onKeyDown={handleKeyDown}
@@ -196,9 +223,6 @@ export const LabSection = () => {
 
 					<div className='flex items-center justify-between gap-4 flex-wrap lg:flex-nowrap'>
 						<div className='flex gap-4 flex-wrap'>
-							<Button variant='secondary' size='small'>
-								Reporte
-							</Button>
 							<Button variant='primary' size='small' onClick={() => handleOpenCreatedModal()}>
 								Nuevo laboratorio
 							</Button>
@@ -209,7 +233,7 @@ export const LabSection = () => {
 				<section className='space-y-4'>
 					<div className='flex items-center gap-4 w-full flex-wrap justify-between text-xs text-slate-500 dark:text-gray-300 font-semibold dark:bg-gray-700/40 bg-slate-100 p-2 rounded-lg'>
 						<div className='flex items-center space-x-1'>
-							<div className='flex text-slate-500 text-xs pr-2 dark:text-slate-200 w-full sm:w-auto'>
+							<div className='flex text-slate-500 text-xs pr-2 dark:text-slate-200 sm:w-auto'>
 								<button
 									onClick={() => handlePageChange(page - 1)}
 									disabled={!totalRecords || page === 1}
@@ -238,6 +262,7 @@ export const LabSection = () => {
 									<BiCaretRight size={16} />
 								</button>
 							</div>
+
 							<div className='border-l pl-4 dark:border-gray-600'>
 								<span>
 									{totalPages && totalRecords
@@ -274,7 +299,7 @@ export const LabSection = () => {
 			{showCreatedModal && <ModalCreate onClose={toggleCreatedModal} onSuccess={fetchLabs} />}
 			{showUpdatedModal && <ModalUpdate lab={selected} onClose={toggleUpdatedModal} onSuccess={fetchLabs} />}
 			{showAssignAnalystModal && (
-				<AssignAnalystForm lab={selected} onClose={toggleAssignAnalystModal} onSuccess={fetchLabs} />
+				<ModalAssignedAnalyst lab={selected} onClose={toggleAssignAnalystModal} onSuccess={fetchLabs} />
 			)}
 			{showRemoveAnalystModal && (
 				<ModalAnalystDelete lab={selected} onClose={toggleRemoveAnalystModal} onSuccess={fetchLabs} />
@@ -282,6 +307,10 @@ export const LabSection = () => {
 			{showActivedModal && <ModalActive lab={selected} onClose={toggleActivedModal} onSuccess={fetchLabs} />}
 			{showDesactivedModal && <ModalDesactive lab={selected} onClose={toggleDesactivedModal} onSuccess={fetchLabs} />}
 			{showDeletedModal && <ModalDelete lab={selected} onClose={toggleDeletedModal} onSuccess={fetchLabs} />}
+			{showDeletedPermanentModal && (
+				<ModalDeletePermanent lab={selected} onClose={toggleDeletedPermanentModal} onSuccess={fetchLabs} />
+			)}
+			{showRestoredModal && <ModalRestore lab={selected} onClose={toggleRestoredModal} onSuccess={fetchLabs} />}
 			{showReportModal && <ReportModal onClose={toggleReportModal} />}
 		</>
 	)

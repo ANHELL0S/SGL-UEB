@@ -30,7 +30,7 @@ export const REACTIVE_UNIT = {
 	},
 	UNIDADES: 'unit',
 	AMPOLLAS: 'amp',
-	PRUEBAS: 'pruebas',
-	CORRIDAS: 'corridas',
+	PRUEBAS: 'pb',
+	CORRIDAS: 'crrd',
 	PETRIFILMS: 'petrifilms',
 }

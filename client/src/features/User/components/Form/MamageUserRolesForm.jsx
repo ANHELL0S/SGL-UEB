@@ -5,7 +5,7 @@ import { useAllRolesStore } from '../../../../hooks/useRole'
 import { Button } from '../../../../components/Button/Button'
 import { ROLES_ES } from '../../../../helpers/constants.helper'
 import { ToastGeneric } from '../../../../components/Toasts/Toast'
-import { managerUserRolesRequest } from '../../../../services/api/user.api'
+import { UserService } from '../../../../services/api/user.api'
 
 const overlayVariants = {
 	hidden: { opacity: 0, backdropFilter: 'blur(0px)' },
@@ -53,11 +53,11 @@ export const MamageUserRolesForm = ({ onClose, onSuccess, user }) => {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			const response = await managerUserRolesRequest({
+			const response = await UserService.managerUserRolesRequest({
 				id_user: user.id_user,
 				roles: selectedRoles,
 			})
-			ToastGeneric({ type: 'success', message: response.message })
+			ToastGeneric({ type: 'success', message: response.data.message })
 			onClose()
 			onSuccess()
 		} catch (error) {
@@ -85,7 +85,7 @@ export const MamageUserRolesForm = ({ onClose, onSuccess, user }) => {
 						exit='hidden'
 						variants={overlayVariants}>
 						<motion.div
-							className='relative flex h-full w-full max-w-md flex-col gap-y-5 bg-slate-50 p-6 text-gray-600 shadow-lg dark:bg-gray-800 dark:text-gray-300'
+							className='relative flex h-full w-full max-w-md flex-col gap-y-5 bg-white p-6 text-gray-600 shadow-lg dark:bg-gray-800 dark:text-gray-300'
 							variants={modalVariants}
 							onClick={e => e.stopPropagation()}>
 							<div className='flex items-center justify-between'>
@@ -123,8 +123,8 @@ export const MamageUserRolesForm = ({ onClose, onSuccess, user }) => {
 												key={role?.id_rol}
 												className={`p-4 rounded-xl flex items-center gap-x-3 cursor-pointer transition  ${
 													isSelected
-														? 'dark:bg-cyan-100 dark:text-gray-800'
-														: 'dark:bg-gray-700/40 dark:hover:bg-gray-700'
+														? 'dark:bg-cyan-100 dark:text-gray-800 bg-gray-300'
+														: 'dark:bg-gray-700/40 dark:hover:bg-gray-700 bg-gray-50'
 												}`}
 												onClick={() => handleRoleChange(role?.id_rol)}>
 												<input
@@ -134,7 +134,7 @@ export const MamageUserRolesForm = ({ onClose, onSuccess, user }) => {
 													onChange={() => {}}
 													className='hidden'
 												/>
-												<span className='capitalize font-medium'>
+												<span className='text-base font-medium'>
 													{ROLES_ES[role?.type] || role?.type.replace('_', ' ')}
 												</span>
 											</div>

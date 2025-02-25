@@ -22,18 +22,18 @@ export class UserService {
 
 	static async createUser(data, transaction) {
 		const existingEmail = await UserRepository.findUserByField('email', data.email)
-		if (existingEmail) return { error: 'El correo electrónico ya está en uso.' }
+		if (existingEmail) return { code: 400, error: 'El correo electrónico ya está en uso.' }
 
 		const existingPhone = await UserRepository.findUserByField('phone', data.phone)
-		if (existingPhone) return { error: 'El número de teléfono ya está en uso.' }
+		if (existingPhone) return { code: 400, error: 'El número de teléfono ya está en uso.' }
 
 		const existingIdentificationCard = await UserRepository.findUserByField('identification_card', data.dni)
-		if (existingIdentificationCard) return { error: 'La cédula de identidad ya está en uso.' }
+		if (existingIdentificationCard) return { code: 400, error: 'La cédula de identidad ya está en uso.' }
 
 		const existingCode = await UserRepository.findUserByField('code', data.code)
-		if (existingCode) return { error: 'El código ya está en uso.' }
+		if (existingCode) return { code: 400, error: 'El código ya está en uso.' }
 
-		const hashedPassword = await hashPassword(data.dni)
+		const hashedPassword = await hashPassword(`${data.dni}${data.code}`)
 
 		const userData = UserDTO.transformData({ ...data, password: hashedPassword })
 		const createdUser = await UserRepository.createUser(userData, transaction)
@@ -89,10 +89,16 @@ export class UserService {
 	}
 
 	static async deleteUser(id, transaction) {
-		const associatedAnalyst = await UserRepository.findLaboratoryAnalyst(id)
-		if (associatedAnalyst) return { error: 'Usuario asignado a un laboratorio.' }
-		const associatedAccessLab = await UserRepository.findAccessLab(id)
-		if (associatedAccessLab) return { error: 'Usuario responsable de un acceso.' }
+		await UserRepository.updateUser(id, { active: false }, transaction)
 		return UserRepository.deleteUser(id, transaction)
+	}
+
+	static async restoreUser(id, transaction) {
+		await UserRepository.updateUser(id, { active: true }, transaction)
+		return await UserRepository.restoreUser(id, transaction)
+	}
+
+	static async deletePermanentUser(id, transaction) {
+		return await UserRepository.deletePermanentUser(id, transaction)
 	}
 }

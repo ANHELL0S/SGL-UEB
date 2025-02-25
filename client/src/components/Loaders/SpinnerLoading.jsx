@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { BiLoaderCircle } from 'react-icons/bi'
 
 export const SpinnerLoading = ({ text, isLoading }) => {
 	const [fadeOut, setFadeOut] = useState(false)

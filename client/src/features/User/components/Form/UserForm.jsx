@@ -68,17 +68,17 @@ export const UserForm = ({ text, onSubmit, onClose, onChange, loading, formData 
 							variants={overlayVariants}
 						/>
 						<motion.div
-							className='fixed inset-0 m-2 z-50 flex items-center justify-end overflow-auto'
+							className='fixed inset-0 z-50 flex items-center justify-end overflow-auto'
 							initial='hidden'
 							animate='visible'
 							exit='hidden'
 							variants={overlayVariants}>
 							<motion.div
-								className='relative flex h-full w-full max-w-md flex-col gap-y-5 rounded-lg bg-white p-6 text-gray-600 shadow-lg dark:bg-gray-800 dark:text-gray-300'
+								className='relative flex h-full w-full max-w-md flex-col gap-y-5 bg-white p-6 text-gray-600 shadow-lg dark:bg-gray-800 dark:text-gray-300'
 								variants={modalVariants}
 								onClick={e => e.stopPropagation()}>
 								<div className='flex items-center justify-between'>
-									<h3 className='text-lg font-semibold text-slate-600 dark:text-gray-100'>{text?.title}</h3>
+									<h1 className='text-xl font-semibold text-slate-600 dark:text-gray-100'>{text?.title}</h1>
 
 									<Button
 										variant='none'

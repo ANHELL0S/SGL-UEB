@@ -9,7 +9,6 @@ const OfflineAlert = () => {
 
 	useEffect(() => {
 		if (!isOnline) setWasOffline(true)
-
 		if (isOnline && wasOffline) {
 			setShowReconnectMessage(true)
 			const timer = setTimeout(() => {
@@ -30,7 +29,7 @@ const OfflineAlert = () => {
 						initial={{ y: 50, opacity: 0 }}
 						animate={{ y: 0, opacity: 1, transition: { duration: 0.4, ease: 'circInOut' } }}
 						exit={{ y: 50, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }}
-						className='fixed bottom-0 left-0 right-0 z-50 bg-neutral-800 py-1.5 text-center text-sm text-neutral-50'>
+						className='fixed bottom-0 left-0 right-0 z-50 bg-neutral-800 py-1 text-center text-xs text-neutral-50'>
 						<p>Sin conexión a internet</p>
 					</motion.div>
 				)}
@@ -43,7 +42,7 @@ const OfflineAlert = () => {
 						initial={{ y: 50, opacity: 0 }}
 						animate={{ y: 0, opacity: 1, transition: { duration: 0.4, ease: 'circInOut' } }}
 						exit={{ y: 50, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }}
-						className='fixed bottom-0 left-0 right-0 z-50 bg-green-600 py-1.5 text-center text-sm text-white'>
+						className='fixed bottom-0 left-0 right-0 z-50 bg-green-600 py-1 text-center text-xs text-white'>
 						<p>De nuevo en línea</p>
 					</motion.div>
 				)}

@@ -16,9 +16,7 @@ export const facultiesAndCareers = async () => {
 
 			if (!faculty) {
 				faculty = await faculty_Scheme.create({ name: facultyName })
-				console.log(`Facultad creada: ${facultyName}`)
-			} else {
-				console.log(`Facultad ya existe: ${facultyName}`)
+				//console.log(`Facultad creada: ${facultyName}`)
 			}
 
 			// Procesar las carreras de la facultad
@@ -32,9 +30,7 @@ export const facultiesAndCareers = async () => {
 						name: careerData.name,
 						id_faculty_fk: faculty.id_faculty,
 					})
-					console.log(`Carrera creada: ${careerData.name} en ${facultyName}`)
-				} else {
-					console.log(`Carrera ya existe: ${careerData.name} en ${facultyName}`)
+					//	console.log(`Carrera creada: ${careerData.name} en ${facultyName}`)
 				}
 			}
 		}

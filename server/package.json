@@ -31,6 +31,8 @@
 		"chalk": "^5.3.0",
 		"compression": "^1.7.4",
 		"crypto": "^1.0.1",
+		"dock": "^0.1.4",
+		"docx": "^9.2.0",
 		"express-rate-limit": "^7.4.1",
 		"helmet": "^8.0.0",
 		"ioredis": "^5.4.1",
@@ -43,8 +45,10 @@
 		"p-queue": "^8.0.1",
 		"pdfkit": "^0.15.1",
 		"pdfkit-table": "^0.1.99",
+		"puppeteer": "^24.2.0",
 		"swagger-jsdoc": "^6.2.8",
 		"swagger-ui-express": "^5.0.1",
+		"ua-parser-js": "^2.0.0",
 		"xlsx": "^0.18.5",
 		"yamljs": "^0.3.0"
 	}

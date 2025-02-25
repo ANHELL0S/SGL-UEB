@@ -11,6 +11,7 @@ export class UserDTO {
 			roles: entity.roles,
 			createdAt: entity.createdAt,
 			updatedAt: entity.updatedAt,
+			deletedAt: entity.deletedAt,
 		}
 	}
 
@@ -26,6 +27,7 @@ export class UserDTO {
 			roles: data.roles,
 			createdAt: data.createdAt,
 			updatedAt: data.updatedAt,
+			deletedAt: entity.deletedAt,
 		}
 	}
 

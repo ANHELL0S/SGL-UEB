@@ -1,10 +1,7 @@
 import { z } from 'zod'
 
 export const user_zod = z.object({
-	names: z
-		.string()
-		.min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-		.max(250, { message: 'El nombre no puede tener más de 250 caracteres' }),
+	names: z.string().min(3, { message: 'Minimo 3 caracteres' }).max(250, { message: 'Máximo 250 caracteres' }),
 
 	email: z.string().email({ message: 'Ingrese un correo electrónico válido' }),
 
@@ -26,10 +23,7 @@ export const user_zod = z.object({
 })
 
 export const manager_user_roles_zod = z.object({
-	names: z
-		.string()
-		.min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-		.max(250, { message: 'El nombre no puede tener más de 250 caracteres' }),
+	names: z.string().min(3, { message: 'Minimo 3 caracteres' }).max(250, { message: 'Máximo 250 caracteres' }),
 
 	email: z.string().email({ message: 'Ingrese un correo electrónico válido' }),
 

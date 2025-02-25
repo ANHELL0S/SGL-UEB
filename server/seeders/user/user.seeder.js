@@ -19,7 +19,7 @@ const userSeeder = async () => {
 		}, {})
 
 		for (const user of user_data) {
-			const hashedPassword = await hashPassword(user.password)
+			const hashedPassword = await hashPassword(user.email)
 			const createdUser = await user_Schema.create({
 				...user,
 				password: hashedPassword,
@@ -48,7 +48,7 @@ const userSeeder = async () => {
 
 		if (usersCreated) console.log('Seeder -> Usuarios y asignación de roles creados exitosamente.')
 	} catch (error) {
-		console.error('Error al crear usuarios predeterminados:', error.message)
+		console.error('Error al crear usuarios predeterminados:', error)
 	}
 }
 

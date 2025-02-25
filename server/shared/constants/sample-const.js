@@ -1,6 +1,17 @@
-export const SAMPLE_LIQUID = 'liquid'
-export const SAMPLE_SOLID = 'solid'
-export const SAMPLE_GASEOUS = 'gaseous'
-export const SAMPLE_THESIS = 'thesis'
-export const SAMPLE_PROJECT = 'project'
-export const SAMPLE_EXTERNAL = 'external'
+export const SAMPLE_TYPE = {
+	LIQUID: 'liquid',
+	SOLID: 'solid',
+	GASEOUS: 'gaseous',
+}
+
+export const SAMPLE_CATEGORY = {
+	THESIS: 'thesis',
+	PROJECT: 'project',
+	EXTERNAL: 'external',
+}
+
+export const SAMPLE_STATUS = {
+	PENDING: 'pending',
+	APPROVED: 'approved',
+	REJECTED: 'rejected',
+}

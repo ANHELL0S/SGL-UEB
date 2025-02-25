@@ -1,15 +1,9 @@
-import {
-	ACCESS_MANAGER,
-	DIRECTOR,
-	GENERAL_ADMIN,
-	SUPERVISOR,
-	TECHNICAL_ANALYST,
-} from '../../shared/constants/roles-const.js'
+import { ROLES } from '../../shared/constants/roles-const.js'
 
 export const roles = [
-	{ type_rol: GENERAL_ADMIN },
-	{ type_rol: DIRECTOR },
-	{ type_rol: SUPERVISOR },
-	{ type_rol: TECHNICAL_ANALYST },
-	{ type_rol: ACCESS_MANAGER },
+	{ type_rol: ROLES.GENERAL_ADMIN },
+	{ type_rol: ROLES.DIRECTOR },
+	{ type_rol: ROLES.SUPERVISOR },
+	{ type_rol: ROLES.TECHNICAL_ANALYST },
+	{ type_rol: ROLES.ACCESS_MANAGER },
 ]

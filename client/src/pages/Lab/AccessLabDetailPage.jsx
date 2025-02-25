@@ -4,6 +4,7 @@ import { PrivateLayout } from '../../layouts/Private/PrivateLayout'
 import { SpinnerLoading } from '../../components/Loaders/SpinnerLoading'
 import { AccessLabDetailSection } from '../../features/AccessLab/AccessLabDetail'
 import { Status500 } from '../../components/Banner/StatusServer'
+
 const AccessLabPage = () => {
 	const { loading, error, userRoles } = useRoles()
 
@@ -17,7 +18,7 @@ const AccessLabPage = () => {
 
 	if (error) return <Status500 text={errorAccessLabs} />
 
-	const rolesAccepted = [ROLES.ACCESS_MANAGER, ROLES.DIRECTOR]
+	const rolesAccepted = [ROLES.GENERAL_ADMIN, ROLES.ACCESS_MANAGER, ROLES.DIRECTOR, ROLES.TECHNICAL_ANALYST]
 	const roleAccept = userRoles.some(userRole => rolesAccepted.includes(userRole.type))
 
 	return (

@@ -16,8 +16,41 @@ const useCrud = () => {
 
 export const useCreated = () => useCrud()
 export const useUpdated = () => useCrud()
-export const useQuoted = () => useCrud()
 export const useApproved = () => useCrud()
 export const usePending = () => useCrud()
 export const useRejected = () => useCrud()
-export const useDelete = () => useCrud()
+export const useDeleted = () => useCrud()
+export const useRestored = () => useCrud()
+export const useAddResult = () => useCrud()
+export const useAddApplicant = () => useCrud()
+export const useUpdatedApplicant = () => useCrud()
+export const useDeletedApplicant = () => useCrud()
+export const useDeletedPermanent = () => useCrud()
+
+// SAMPLE
+export const useCreatedSample = () => useCrud()
+export const useDeletedSample = () => useCrud()
+export const useUpdatedSample = () => useCrud()
+
+// RESULT
+export const useCreateResult = () => useCrud()
+export const useDeletedResult = () => useCrud()
+export const useUpdatedResult = () => useCrud()
+
+// CONSUMPTION
+export const useCreateConsumption = () => useCrud()
+export const useDeleteConsumption = () => useCrud()
+
+// REPORT
+export const useGenerateReportSample = () => useCrud()
+export const useEmited = () => useCrud()
+export const useNotEmited = () => useCrud()
+export const useDeletedReport = () => useCrud()
+
+// ASIGNED LAB
+export const useAsignedLab = () => useCrud()
+
+// ASIGNED ANALYSIS
+export const useCreatedAnalysis = () => useCrud()
+export const useUpdatedAnalysis = () => useCrud()
+export const useDeletedAnalysis = () => useCrud()

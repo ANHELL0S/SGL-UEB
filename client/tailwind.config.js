@@ -9,7 +9,13 @@ export default {
 	darkMode: 'class',
 	plugins: [daisyui],
 	daisyui: {
-		themes: ['light', 'dark', 'cupcake'],
+		themes: false,
 		darkTheme: 'dark',
+		base: true,
+		styled: true,
+		utils: true,
+		prefix: '',
+		logs: true,
+		themeRoot: ':root',
 	},
 }

@@ -40,21 +40,23 @@ export class UserRepository {
 			include: [
 				{
 					model: user_role_main_Schema,
+					paranoid: false,
 					include: [
 						{
 							model: user_roles_Schema,
-							include: [{ model: rol_Schema }],
+							paranoid: false,
+							include: [{ model: rol_Schema, paranoid: false }],
 						},
 					],
 				},
 			],
+			paranoid: false,
 			attributes: { exclude: ['password'] },
 			where: whereCondition,
 			limit,
 			offset,
-			subQuery: false,
 			distinct: true,
-			order: [['createdAt', 'DESC']],
+			order: [['updatedAt', 'DESC']],
 		})
 
 		return {
@@ -76,21 +78,22 @@ export class UserRepository {
 					],
 				},
 			],
+			paranoid: false,
 		})
 
 		return userFound ? new UserEntity(userFound) : null
 	}
 
 	static async createUser(data, transaction) {
-		return user_Schema.create(data, { transaction })
+		return await user_Schema.create(data, { transaction })
 	}
 
 	static async finduserRolesIntermediate(id) {
-		return user_role_main_Schema.findOne({ where: { id_user_fk: id } })
+		return await user_role_main_Schema.findOne({ where: { id_user_fk: id } })
 	}
 
 	static async userRolesIntermediate(data, transaction) {
-		return user_role_main_Schema.create(data, { transaction })
+		return await user_role_main_Schema.create(data, { transaction })
 	}
 
 	static async assignRolesToUser(data, transaction) {
@@ -108,15 +111,17 @@ export class UserRepository {
 				id_user_role_intermediate_fk: id,
 			},
 			transaction,
+			paranoid: false,
+			force: true,
 		})
 	}
 
 	static async updateUser(id, data, transaction) {
-		return user_Schema.update(data, { where: { id_user: id }, transaction })
+		return await user_Schema.update(data, { where: { id_user: id }, transaction, paranoid: false })
 	}
 
 	static async updatePassword(id, hashedPassword, transaction) {
-		return user_Schema.update(
+		return await user_Schema.update(
 			{ password: hashedPassword },
 			{
 				where: { id_user: id },
@@ -126,14 +131,22 @@ export class UserRepository {
 	}
 
 	static async deleteUser(id, transaction) {
-		return user_Schema.destroy({ where: { id_user: id }, transaction })
+		return await user_Schema.destroy({ where: { id_user: id }, transaction })
+	}
+
+	static async restoreUser(id, transaction) {
+		return await user_Schema.restore({ where: { id_user: id }, transaction })
+	}
+
+	static async deletePermanentUser(id, transaction) {
+		return await user_Schema.destroy({ where: { id_user: id }, transaction, paranoid: false, force: true })
 	}
 
 	static async findLaboratoryAnalyst(id) {
-		return laboratory_analyst_Schema.findOne({ where: { id_analyst_fk: id } })
+		return await laboratory_analyst_Schema.findOne({ where: { id_analyst_fk: id } })
 	}
 
 	static async findAccessLab(id) {
-		return access_lab_Scheme.findOne({ where: { id_access_manager_fk: id } })
+		return await access_lab_Scheme.findOne({ where: { id_access_manager_fk: id } })
 	}
 }

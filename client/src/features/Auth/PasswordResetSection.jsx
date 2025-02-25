@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { LOGIN_PATH } from '../../helpers/constants.helper.js'
+import { PATH_AUTH } from '../../helpers/constants.helper.js'
 import { ToastGeneric } from '../../components/Toasts/Toast.jsx'
 import { PasswordResetForm } from './components/Form/PasswordResetForm.jsx'
 import { TimeOutResetPassword } from './components/Banner/TimeOutResetPassword.jsx'
+import { ImageCarousel } from './components/Banner/AuthCarousel.jsx'
 
 const PasswordResetSection = () => {
 	const { token } = useParams()
@@ -51,15 +52,18 @@ const PasswordResetSection = () => {
 	const handleSuccess = () => {
 		setIsSuccess(true)
 		setTimeLeft(null)
-		navigate(LOGIN_PATH)
+		navigate(PATH_AUTH.LOGIN)
 	}
 
 	if (tokenExpired) return <TimeOutResetPassword />
 
 	return (
-		<div className='flex items-center justify-center'>
-			<div className='grid grid-cols-1 gap-4 items-center justify-center max-w-6xl w-full'>
-				<div className='border border-neutral-300 rounded-lg p-6 max-w-md shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)] mx-auto flex flex-col gap-4'>
+		<div className='flex flex-col items-center justify-center min-h-screen bg-slate-50'>
+			<div className='grid md:grid-cols-2 items-center'>
+				{/* Right Section */}
+				<ImageCarousel />
+
+				<div className='max-w-md p-10 mx-auto flex flex-col gap-4'>
 					<div className='flex items-center justify-center p-3 mx-auto'>
 						{timeLeft !== null && (
 							<p className='text-center text-neutral-600 text-sm flex font-semibold flex-col'>
@@ -70,10 +74,6 @@ const PasswordResetSection = () => {
 					</div>
 
 					<h3 className='text-neutral-700 text-3xl font-extrabold text-center'>Restablecer contraseña</h3>
-
-					<p className='text-neutral-500 text-sm leading-relaxed text-start'>
-						¡Enhorabuena! Ahora puedes restablecer tu contraseña para asegurar el acceso a tu cuenta.
-					</p>
 
 					<PasswordResetForm decodedToken={decodedToken} token={token} onSuccess={handleSuccess} />
 				</div>

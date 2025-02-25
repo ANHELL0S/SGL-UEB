@@ -2,10 +2,10 @@
 
 # Parámetros de la base de datos
 DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_NAME=lab_ueb_local
-DB_USER=postgres
-DB_PASSWORD=Shouko2022@
+DB_PORT=5434
+DB_NAME=lab_ueb_db
+DB_USER=BlliCstsZl7jbimsNIF8S47yup0KJ6m0
+DB_PASSWORD=BlliCstsZl7jbimsNIF8S47yup0KJ6m0
 
 BACKUP_DIR="../backups/db"
 LOG_DIR="../backups/logs"

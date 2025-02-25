@@ -5,10 +5,30 @@ export const reactive_schema_zod = z.object({
 
 	code: z.string().min(3, 'Minimo 3 caracteres').max(255, 'Maximo 255 caracteres'),
 
-	number_of_containers: z.string().min(1, 'Minimo 1 carácter'),
-	initial_quantity: z.string().min(1, 'Minimo 1 carácter'),
-	current_quantity: z.string().min(1, 'Minimo 1 carácter'),
-	quantity_consumed: z.string().min(1, 'Minimo 1 carácter'),
+	number_of_containers: z
+		.string({
+			required_error: 'Precio público es requerido.',
+			invalid_type_error: 'Precio público debe ser un número.',
+		})
+		.min(1, 'Por favor, ingresa un número')
+		.max(10, 'Máximo 10 dígitos')
+		.refine(val => /^\d+$/.test(val), {
+			message: 'Debe ser un número entero.',
+		}),
+
+	current_quantity: z
+		.string({
+			required_error: 'Precio público es requerido.',
+			invalid_type_error: 'Precio público debe ser un número.',
+		})
+		.min(1, 'Por favor, ingresa un número')
+		.max(10, 'Máximo 10 dígitos')
+		.refine(val => /^\d{1,7}(\.\d{1,5})?$/.test(val), {
+			message: 'Máximo 5 decimales.',
+		})
+		.refine(val => !isNaN(parseFloat(val)) && isFinite(val), {
+			message: 'Debe ser un número válido.',
+		}),
 
 	unit: z.string().uuid('Debe ser un UUID válido'),
 
@@ -20,12 +40,7 @@ export const reactive_schema_zod = z.object({
 		.refine(date => {
 			if (!date) return true // Permitir vacío
 			return new Date(date) > new Date() // Comparar directamente
-		}, 'La fecha de expiración debe ser una fecha futura o vacía'),
+		}, 'Debe ser una fecha futura.'),
 
-	is_controlled: z
-		.union([z.literal('true'), z.literal('false')])
-		.transform(val => val === 'true') // Transforma el string a booleano
-		.refine(val => typeof val === 'boolean', {
-			message: 'Por favor selecciona una opción válida.',
-		}),
+	control_tracking: z.enum(['si', 'no']),
 })

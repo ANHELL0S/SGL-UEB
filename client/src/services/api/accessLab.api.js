@@ -1,68 +1,159 @@
+import { ApiService } from './_main'
 import { accessLabInstance } from '../../config/instances'
 
-export const getAllAccessLabsRequest = async (page, limit, search) => {
-	try {
-		const response = await accessLabInstance.get('/', {
-			params: { page, limit, search },
-		})
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
-	}
-}
+export class AccessService extends ApiService {
+	static instance = accessLabInstance
 
-export const getAllAccessPertainLabRequest = async (id, page, limit, search) => {
-	try {
-		const response = await accessLabInstance.get(`/${id}/pertain-lab`, {
-			params: { page, limit, search },
-		})
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getAllRequest(page, limit, search) {
+		try {
+			const response = await this.instance.get('/', { params: { page, limit, search } })
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const getAccessLabByIdRequest = async id => {
-	try {
-		const response = await accessLabInstance.get(`/${id}`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async asignedLabRequest(data) {
+		try {
+			return await this.instance.post('/lab-asigned', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const createAccessLabRequest = async data => {
-	try {
-		const response = await accessLabInstance.post('/', data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getAllAccessPertainLabRequest(id, page, limit, search) {
+		try {
+			const response = await this.instance.get(`/${id}/pertain-lab`, { params: { page, limit, search } })
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const updateAccessLabRequest = async (id, data) => {
-	try {
-		const response = await accessLabInstance.put(`/${id}`, data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getAllAccessPertainToAnalystRequest(page, limit, search) {
+		try {
+			const response = await this.instance.get('/pertain-to-analyst', { params: { page, limit, search } })
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const deleteAccessLabRequest = async id => {
-	try {
-		const response = await accessLabInstance.delete(`/${id}`)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getByIdRequest(id) {
+		try {
+			const response = await this.instance.get(`/${id}`)
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
-}
 
-export const changeStatusAccessLabRequest = async (id, data) => {
-	try {
-		const response = await accessLabInstance.put(`/${id}/status`, data)
-		return response.data
-	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+	static async getByCodeRequest(code) {
+		try {
+			const response = await this.instance.get(`/${code}/by-code`)
+			return response.data
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async createRequest(data) {
+		try {
+			return await this.instance.post('/', data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async updateRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async changeStatusRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}/status`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deleteRequest(id, data) {
+		try {
+			return await this.instance.delete(`/${id}`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async restoreRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}/restore`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deletePermanentRequest(id, data) {
+		try {
+			return await this.instance.delete(`/${id}/permanent`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	// APPLCANTS
+
+	static async addApplicantRequest(data) {
+		try {
+			return await this.instance.post('/applicant', data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async updatedApplicanRequest(id, data) {
+		try {
+			return await this.instance.put(`/${id}/applicant`, data)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async deletedApplicanRequest(id) {
+		try {
+			return await this.instance.delete(`/${id}/applicant`)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	// ASIGNED LAB
+	static async getAllAsignedLabRequest(id) {
+		try {
+			return await this.instance.get(`/${id}/lab-asigned`)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	// ANALYSIS
+	static async getAllAnalysisPertainToAcessRequest(id) {
+		try {
+			return await this.instance.get(`/${id}/analysis-pertain-access`)
+		} catch (error) {
+			throw error.response?.data
+		}
+	}
+
+	static async createdAnalysisPertainToAcessRequest(data) {
+		try {
+			return await this.instance.post('/analysis-pertain-access', data)
+		} catch (error) {
+			throw error.response?.data
+		}
 	}
 }

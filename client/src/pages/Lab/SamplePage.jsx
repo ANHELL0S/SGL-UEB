@@ -16,7 +16,7 @@ const SamplePage = () => {
 
 	if (error) return <p className='text-sm text-red-500'>Error: {error}</p>
 
-	const rolesAccepted = [ROLES.TECHNICAL_ANALYST]
+	const rolesAccepted = [ROLES.GENERAL_ADMIN, ROLES.TECHNICAL_ANALYST]
 	const roleAccept = userRoles.some(userRole => rolesAccepted.includes(userRole.type))
 
 	return (

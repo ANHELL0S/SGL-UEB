@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { lab_schema_zod } from '../../validators/labValidator'
 import { Button } from '../../../../components/Button/Button'
 import { InputFieldZod } from '../../../../components/Input/InputFieldZod'
+import { TextTareaFieldZod } from '../../../../components/Input/TextTareaFieldZod'
 
 const overlayVariants = {
 	hidden: { opacity: 0, backdropFilter: 'blur(0px)' },
@@ -68,13 +69,13 @@ export const LabForm = ({ text, onSubmit, onClose, onChange, loading, formData }
 							variants={overlayVariants}
 						/>
 						<motion.div
-							className='fixed inset-0 m-2 z-50 flex items-center justify-end overflow-auto'
+							className='fixed inset-0 z-50 flex items-center justify-end overflow-auto'
 							initial='hidden'
 							animate='visible'
 							exit='hidden'
 							variants={overlayVariants}>
 							<motion.div
-								className='relative flex h-full w-full max-w-md flex-col gap-y-5 rounded-lg bg-white p-6 text-gray-600 shadow-lg dark:bg-gray-800 dark:text-gray-300'
+								className='relative flex h-full w-full max-w-md flex-col gap-y-5 bg-white p-6 text-gray-600 shadow-lg dark:bg-gray-800 dark:text-gray-300'
 								variants={modalVariants}
 								onClick={e => e.stopPropagation()}>
 								<div className='flex items-center justify-between'>
@@ -108,7 +109,7 @@ export const LabForm = ({ text, onSubmit, onClose, onChange, loading, formData }
 										error={errors.location}
 										required={false}
 									/>
-									<InputFieldZod
+									<TextTareaFieldZod
 										label='Descripción'
 										placeholder='Ingrese la descripción'
 										type='text'

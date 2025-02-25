@@ -1,7 +1,7 @@
 import { env } from '../../config/env-config.js'
 import { transporter, defaultFromEmail } from '../../config/mailer-config.js'
 
-export const send_email_with_info_sigup = async (full_name, email, identification_card) => {
+export const send_email_with_info_sigup = async (full_name, email, identification_card, code) => {
 	return new Promise((resolve, reject) => {
 		const subject = 'Bienvenid@'
 		const html = `
@@ -68,7 +68,7 @@ export const send_email_with_info_sigup = async (full_name, email, identificatio
 								<p>Para iniciar sesión en el sistema, utiliza el siguiente enlace: <a href="${env.URL_MAIN}" target="_blank">${env.URL_MAIN}</a></p>
 								<p>Tus credenciales para poder ingresar son:</p>
 								<p><strong>Email:</strong> ${email}</p>
-								<p><strong><strong>Contraseña:</strong> ${identification_card}</p>
+								<p><strong><strong>Contraseña:</strong> ${identification_card}${code}</p>
 								<p>Por favor, no compartas tus crendenciales con nadie y guardalas en un lugar seguro.</p>
 								<p>Si necesitas asistencia o tienes alguna pregunta, no dudes en contactarnos a través de nuestro <a href="https://wa.me/0980868530" target="_blank">soporte</a>:</p>
 						</div>

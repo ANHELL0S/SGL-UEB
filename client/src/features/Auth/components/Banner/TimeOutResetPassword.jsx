@@ -1,7 +1,8 @@
 import { Button } from '../../../../components/Button/Button'
-import { useNavigate } from 'react-router-dom'
-import path_img from '../../../assets/images/time_out_password.svg'
+import { Link, useNavigate } from 'react-router-dom'
+import path_img from '../../../../assets/images/time_out_password.svg'
 import { PATH_PRIVATE, PATH_AUTH } from '../../../../helpers/constants.helper'
+import { BiArrowBack } from 'react-icons/bi'
 
 const TimeOutResetPassword = ({
 	title = 'Tiempo agotado',
@@ -10,19 +11,17 @@ const TimeOutResetPassword = ({
 	const navigate = useNavigate()
 	return (
 		<>
-			<div className='container mx-auto lg:flex lg:items-center lg:gap-12'>
+			<div className='mx-auto lg:flex lg:items-center lg:gap-12'>
 				<div className='text-slate-00 w-full lg:w-1/2 flex flex-col gap-2'>
 					<h1 className='text-2xl font-semibold text-neutral-600 md:text-2xl'>{title}</h1>
 					<p className='text-slate-500 font-medium text-sm'>{message}</p>
 
 					<div className='flex md:flex-row flex-col items-center justify-between gap-4'>
-						<Button variant='primary' size='full' onClick={() => navigate(PATH_AUTH.RECOVER_ACCOUNT)}>
+						<button
+							onClick={() => navigate(PATH_AUTH.RECOVER_ACCOUNT)}
+							className='p-3 font-medium text-white bg-slate-700 rounded-2xl shadow w-full transition-all duration-300'>
 							Solicitar nuevo enlace
-						</Button>
-
-						<Button variant='secondary' size='full' onClick={() => navigate(PATH_PRIVATE.DASHBOARD)}>
-							Ir al inicio
-						</Button>
+						</button>
 					</div>
 				</div>
 

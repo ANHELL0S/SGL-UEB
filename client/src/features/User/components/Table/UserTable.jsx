@@ -1,4 +1,12 @@
-import { BiDotsHorizontal, BiDotsVertical, BiSolidBullseye, BiSolidEditAlt, BiSolidTrash } from 'react-icons/bi'
+import {
+	BiDotsHorizontal,
+	BiDotsVertical,
+	BiSolidBullseye,
+	BiSolidEditAlt,
+	BiSolidLockAlt,
+	BiSolidTimer,
+	BiSolidTrash,
+} from 'react-icons/bi'
 import { useMemo } from 'react'
 import { useTable } from 'react-table'
 import { useClickOutside } from '../../hook/useClickOutside'
@@ -11,6 +19,8 @@ export const UserTable = ({
 	handleOpenActivedModal,
 	handleOpenDesactivedModal,
 	handleOpenDeletedModal,
+	handleOpenRestoredModal,
+	handleOpenDeletedPermanentModal,
 	dropdownVisible,
 	toggleDropdown,
 }) => {
@@ -55,16 +65,16 @@ export const UserTable = ({
 										key={roleIndex}
 										className={`px-2 py-0.5 text-xs font-semibold rounded-full text-white ${
 											role.type_rol === ROLES.DIRECTOR
-												? 'dark:text-amber-300 dark:bg-amber-700/50 bg-amber-100 text-amber-500'
+												? 'dark:text-amber-300 dark:bg-amber-700/50 bg-amber-200 text-amber-600'
 												: role.type_rol === ROLES.SUPERVISOR
-													? 'dark:text-emerald-300 dark:bg-emerald-700/50 bg-emerald-100 text-emerald-500'
+													? 'dark:text-emerald-300 dark:bg-emerald-700/50 bg-emerald-200 text-emerald-600'
 													: role.type_rol === ROLES.TECHNICAL_ANALYST
-														? 'dark:text-purple-300 dark:bg-purple-700/50 bg-purple-100 text-purple-500'
+														? 'dark:text-purple-300 dark:bg-purple-700/50 bg-purple-200 text-purple-600'
 														: role.type_rol === ROLES.ACCESS_MANAGER
-															? 'dark:text-blue-300 dark:bg-blue-700/50 bg-blue-100 text-blue-500'
-															: 'bg-gray-500'
+															? 'dark:text-blue-300 dark:bg-blue-700/50 bg-blue-200 text-blue-600'
+															: 'bg-gray-600'
 										}`}>
-										{ROLES_ES[role.type_rol] || 'Sin Definir'}
+										{ROLES_ES[role.type_rol] || '---'}
 									</span>
 								))}
 								{row.original.roles.length > 2 && (
@@ -81,7 +91,7 @@ export const UserTable = ({
 			},
 			{
 				Header: 'Estado',
-				accessor: 'estado',
+				accessor: 'active',
 				Cell: ({ row }) => (
 					<span
 						className={`font-semibold px-2 py-0.5 rounded-full ${
@@ -95,8 +105,30 @@ export const UserTable = ({
 			},
 			{
 				Header: 'Creado',
-				accessor: 'creado',
+				accessor: 'createdAt',
 				Cell: ({ row }) => <span className='break-words line-clamp-2'>{formatISOToDate(row.original.createdAt)}</span>,
+			},
+			{
+				Header: 'Actualizado',
+				accessor: 'updatedAt',
+				Cell: ({ row }) => (
+					<span className='break-words line-clamp-2'>
+						{row.original.updatedAt !== row.original.createdAt ? (
+							<span className='break-words line-clamp-2'>{formatISOToDate(row.original.updatedAt)}</span>
+						) : (
+							'---'
+						)}
+					</span>
+				),
+			},
+			{
+				Header: 'Eliminado',
+				accessor: 'deletedAt',
+				Cell: ({ row }) => (
+					<span className='break-words line-clamp-2'>
+						{row.original.deletedAt ? formatISOToDate(row.original.deletedAt) : '---'}
+					</span>
+				),
 			},
 			{
 				Header: 'Acciones',
@@ -122,49 +154,69 @@ export const UserTable = ({
 								ref={dropdownRef}
 								className='absolute right-2 mt-2 px-1 border dark:border-gray-600 w-max bg-white dark:bg-gray-800 rounded-xl shadow-lg z-10'>
 								<ul className='py-1 text-xs space-y-0 text-slate-500 dark:text-gray-300 font-medium'>
-									<li>
-										<button
-											className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
-											onClick={() => handleOpenUpdatedModal(row.original)}>
-											<BiSolidEditAlt size={14} />
-											Editar
-										</button>
-									</li>
+									{!row?.original?.deletedAt && (
+										<>
+											<li>
+												<button
+													className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
+													onClick={() => handleOpenUpdatedModal(row.original)}>
+													<BiSolidEditAlt size={14} />
+													Editar usuario
+												</button>
+											</li>
+
+											<li>
+												<button
+													className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
+													onClick={() => handleOpenAssignRoleModal(row.original)}>
+													<BiSolidLockAlt size={14} />
+													Administrar Roles
+												</button>
+											</li>
+										</>
+									)}
 
 									<li>
-										<button
-											className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
-											onClick={() => handleOpenAssignRoleModal(row.original)}>
-											<BiSolidEditAlt size={14} />
-											Roles
-										</button>
-									</li>
-
-									<li>
-										{row?.original?.active ? (
+										{row?.original?.deletedAt ? (
+											<button
+												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
+												onClick={() => handleOpenRestoredModal(row.original)}>
+												<BiSolidTimer size={14} />
+												Restaurar usuario
+											</button>
+										) : row?.original?.active ? (
 											<button
 												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
 												onClick={() => handleOpenDesactivedModal(row.original)}>
 												<BiSolidBullseye size={14} />
-												Deshabilitar
+												Deshabilitar usuario
 											</button>
 										) : (
 											<button
 												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
 												onClick={() => handleOpenActivedModal(row.original)}>
 												<BiSolidBullseye size={14} />
-												Habilitar
+												Habilitar usuario
 											</button>
 										)}
 									</li>
 
 									<li>
-										<button
-											className='w-full text-left p-2 hover:bg-red-200 dark:hover:bg-red-400 flex items-center gap-2 rounded-lg dark:text-red-400 text-red-500 dark:hover:text-slate-900 transition-all ease-in-out duration-200'
-											onClick={() => handleOpenDeletedModal(row.original)}>
-											<BiSolidTrash size={14} />
-											Eliminar
-										</button>
+										{row?.original?.deletedAt ? (
+											<button
+												className='w-full text-left p-2 hover:bg-red-200 dark:hover:bg-red-400 flex items-center gap-2 rounded-lg dark:text-red-400 text-red-500 dark:hover:text-slate-900 transition-all ease-in-out duration-200'
+												onClick={() => handleOpenDeletedPermanentModal(row.original)}>
+												<BiSolidTrash size={14} />
+												Eliminado permanente
+											</button>
+										) : (
+											<button
+												className='w-full text-left p-2 hover:bg-red-200 dark:hover:bg-red-400 flex items-center gap-2 rounded-lg dark:text-red-400 text-red-500 dark:hover:text-slate-900 transition-all ease-in-out duration-200'
+												onClick={() => handleOpenDeletedModal(row.original)}>
+												<BiSolidTrash size={14} />
+												Eliminar usuario
+											</button>
+										)}
 									</li>
 								</ul>
 							</div>
@@ -179,7 +231,9 @@ export const UserTable = ({
 			handleOpenAssignRoleModal,
 			handleOpenDesactivedModal,
 			handleOpenActivedModal,
+			handleOpenRestoredModal,
 			handleOpenDeletedModal,
+			handleOpenDeletedPermanentModal,
 		]
 	)
 

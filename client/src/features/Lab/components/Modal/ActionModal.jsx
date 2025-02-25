@@ -40,10 +40,15 @@ export const ModalAction = ({ text, actionType, loading, onClose, onSubmit }) =>
 					exit='hidden'
 					variants={overlayVariants}>
 					<motion.div
-						className='relative w-full max-w-lg p-6 m-2 space-y-4 rounded-2xl bg-white shadow-xl dark:bg-gray-800'
+						className='relative w-full max-w-lg p-6 m-2 space-y-4 rounded-xl bg-white shadow-xl dark:bg-gray-800'
 						variants={modalVariants}
 						onClick={e => e.stopPropagation()}>
-						<h3 className='text-lg font-semibold text-slate-600 dark:text-gray-100'>{text.title}</h3>
+						<div className='space-y-1'>
+							<h3 className='text-lg font-semibold text-slate-600 dark:text-gray-100'>{text.title}</h3>
+							<p className='text-sm font-medium text-red-600 dark:text-red-500'>
+								<span>{text?.delete}</span>
+							</p>
+						</div>
 						<p className='text-sm text-slate-600 font-medium dark:text-gray-300'>
 							{text.description_a} <strong>{text.description_b}</strong> {text.description_c}
 						</p>

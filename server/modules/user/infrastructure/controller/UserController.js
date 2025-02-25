@@ -100,19 +100,19 @@ export class UserController {
 
 	static async createUser(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:page:*`
+		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:*`
 
 		try {
 			const parsedData = user_schema_zod.safeParse(req.body)
 			if (!parsedData.success) return sendResponse(res, 400, parsedData.error.errors[0].message)
 
 			const userData = await UserService.createUser(req.body, t)
-			if (userData.error) return sendResponse(res, 400, userData.error)
+			if (userData.error) return sendResponse(res, userData.code, userData.error)
 
 			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
-			await send_email_with_info_sigup(req.body.names, req.body.email, req.body.dni)
+			await send_email_with_info_sigup(req.body.names, req.body.email, req.body.dni, req.body.code)
 
 			await logEvent('info', 'Usuario creado exitosamente.', { data: userData.user }, req?.user?.id, req)
 			return sendResponse(res, 201, 'Usuario creado exitosamente.', userData.user)
@@ -131,8 +131,7 @@ export class UserController {
 
 	static async managerUserRoles(req, res) {
 		const t = await db_main.transaction()
-		const cacheUserKey = `cache:${REDIS_KEYS.USERS.USER}:page:*`
-		const cacheRoleKey = `cache:${REDIS_KEYS.USERS.ROLE}:me:*`
+		const cacheUserKey = `cache:${REDIS_KEYS.USERS.USER}:*`
 
 		try {
 			const parsedData = manager_user_roles_zod.safeParse(req.body)
@@ -142,7 +141,6 @@ export class UserController {
 			if (userData.error) return sendResponse(res, userData.status, userData.error)
 
 			await RedisCache.clearCache(cacheUserKey)
-			await RedisCache.clearCache(cacheRoleKey)
 			await t.commit()
 
 			await logEvent('info', 'Roles del usuario asignados exitosamente.', { data: userData.user }, req?.user?.id, req)
@@ -163,7 +161,7 @@ export class UserController {
 
 	static async updateUser(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:page:*`
+		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
@@ -198,7 +196,7 @@ export class UserController {
 
 	static async changeStatusUser(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:page:*`
+		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
@@ -232,7 +230,7 @@ export class UserController {
 
 	static async deleteUser(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:page:*`
+		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
@@ -253,6 +251,69 @@ export class UserController {
 			await logEvent(
 				'error',
 				'Error al eliminar el estado del usuario.',
+				{ error: error.message, stack: error.stack },
+				req?.user?.id,
+				req
+			)
+			await t.rollback()
+			return sendResponse(res, 500)
+		}
+	}
+
+	static async restoreUser(req, res) {
+		const t = await db_main.transaction()
+		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:*`
+
+		try {
+			const parsedParams = params_schema_zod.safeParse(req?.params)
+			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
+
+			const userFound = await UserService.getUserById(req?.params?.id)
+			if (!userFound) return sendResponse(res, 404, 'Usuario no encontrado.')
+
+			const userData = await UserService.restoreUser(req?.params?.id, t)
+			await RedisCache.clearCache(cacheKey)
+
+			await t.commit()
+
+			await logEvent('info', 'Usuario restaurado exitosamente.', { userData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Usuario restaurado exitosamente.')
+		} catch (error) {
+			await logEvent(
+				'error',
+				'Error al restaurar usuario.',
+				{ error: error.message, stack: error.stack },
+				req?.user?.id,
+				req
+			)
+			await t.rollback()
+			return sendResponse(res, 500)
+		}
+	}
+
+	static async deletePermanentUser(req, res) {
+		const t = await db_main.transaction()
+		const cacheKey = `cache:${REDIS_KEYS.USERS.USER}:*`
+
+		try {
+			const parsedParams = params_schema_zod.safeParse(req?.params)
+			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
+
+			const userFound = await UserService.getUserById(req?.params?.id)
+			if (!userFound) return sendResponse(res, 404, 'Usuario no encontrado.')
+
+			const userData = await UserService.deletePermanentUser(req?.params?.id, t)
+			if (userData?.error) return sendResponse(res, 400, userData.error)
+
+			await RedisCache.clearCache(cacheKey)
+			await t.commit()
+
+			await logEvent('info', 'Usuario eliminado permanentemente.', { userData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Usuario eliminado permanentemente.')
+		} catch (error) {
+			await logEvent(
+				'error',
+				'Error al eliminar permanentemente el usuario.',
 				{ error: error.message, stack: error.stack },
 				req?.user?.id,
 				req
@@ -302,7 +363,7 @@ export class UserController {
 			const institutionData = {
 				name: infoU.institution_name,
 				address: infoU.address,
-				contact: `${infoU.contact_phone} | ${infoU.contact_email}`,
+				contact: `${infoU.contact_phone}`,
 			}
 
 			await logEvent('info', 'Se generó un reporte PDF de usuarios.', null, req.user.id, req)

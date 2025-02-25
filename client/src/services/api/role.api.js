@@ -5,7 +5,7 @@ export const getAllRolesRequest = async () => {
 		const response = await roleInstance.get('/')
 		return response.data
 	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+		throw error.response?.data
 	}
 }
 
@@ -14,7 +14,7 @@ export const getRoleByIdRequest = async id => {
 		const response = await roleInstance.get(`/${id}`)
 		return response.data
 	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+		throw error.response?.data
 	}
 }
 
@@ -23,6 +23,6 @@ export const getMeRoleRequest = async () => {
 		const response = await roleInstance.get('/my-roles')
 		return response.data
 	} catch (error) {
-		throw new Error(`${error.response.data.message}`)
+		throw error.response?.data
 	}
 }

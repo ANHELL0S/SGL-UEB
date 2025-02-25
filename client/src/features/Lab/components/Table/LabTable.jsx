@@ -4,6 +4,7 @@ import {
 	BiSolidBullseye,
 	BiSolidEditAlt,
 	BiSolidShow,
+	BiSolidTimer,
 	BiSolidTrash,
 	BiSolidUserPlus,
 	BiSolidUserX,
@@ -22,6 +23,8 @@ export const LabTable = ({
 	handleOpenActivedModal,
 	handleOpenDesactivedModal,
 	handleOpenDeletedModal,
+	handleOpenDeletedPermanentModal,
+	handleOpenRestoredModal,
 	dropdownVisible,
 	toggleDropdown,
 }) => {
@@ -32,12 +35,12 @@ export const LabTable = ({
 			{
 				Header: 'Nombre',
 				accessor: 'nombre',
-				Cell: ({ row }) => <span className='break-words line-clamp-1'>{row.original.name}</span>,
-			},
-			{
-				Header: 'Desceripción',
-				accessor: 'descripción',
-				Cell: ({ row }) => <span className='break-words line-clamp-1'>{row.original.description}</span>,
+				Cell: ({ row }) => (
+					<div className='flex flex-col gap-1'>
+						<span className='break-words line-clamp-1'>{row.original.name}</span>
+						<span className='break-words line-clamp-1'>Descripción: {row.original.description}</span>
+					</div>
+				),
 			},
 			{
 				Header: 'Ubicación',
@@ -74,8 +77,30 @@ export const LabTable = ({
 			},
 			{
 				Header: 'Creado',
-				accessor: 'creado',
+				accessor: 'createdAt',
 				Cell: ({ row }) => <span className='break-words line-clamp-2'>{formatISOToDate(row.original.createdAt)}</span>,
+			},
+			{
+				Header: 'Actualizado',
+				accessor: 'updatedAt',
+				Cell: ({ row }) => (
+					<span className='break-words line-clamp-2'>
+						{row.original.updatedAt !== row.original.createdAt ? (
+							<span className='break-words line-clamp-2'>{formatISOToDate(row.original.updatedAt)}</span>
+						) : (
+							'---'
+						)}
+					</span>
+				),
+			},
+			{
+				Header: 'Eliminado',
+				accessor: 'deletedAt',
+				Cell: ({ row }) => (
+					<span className='break-words line-clamp-2'>
+						{row.original.deletedAt ? formatISOToDate(row.original.deletedAt) : '---'}
+					</span>
+				),
 			},
 			{
 				Header: 'Acciones',
@@ -102,15 +127,6 @@ export const LabTable = ({
 								className='absolute right-2 mt-2 px-1 border dark:border-gray-600 w-max bg-white dark:bg-gray-800 rounded-xl shadow-lg z-10'>
 								<ul className='py-1 text-xs space-y-0 text-slate-500 dark:text-gray-300 font-medium'>
 									<li>
-										<button
-											className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
-											onClick={() => handleOpenUpdatedModal(row.original)}>
-											<BiSolidEditAlt size={14} />
-											Editar
-										</button>
-									</li>
-
-									<li>
 										<Link
 											to={{
 												pathname: PATH_PRIVATE.LAB_DETAIL.replace(':slug', row.original.name?.replace(/ /g, '-')),
@@ -118,55 +134,86 @@ export const LabTable = ({
 											state={row.original}
 											className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'>
 											<BiSolidShow size={14} />
-											Detalles
+											Ver detalles
 										</Link>
 									</li>
 
-									{row?.original?.analysts ? (
+									{!row?.original?.deletedAt && (
 										<li>
 											<button
 												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
-												onClick={() => handleOpenRemoveAnalystModal(row.original)}>
-												<BiSolidUserX size={14} />
-												Remover analista
-											</button>
-										</li>
-									) : (
-										<li>
-											<button
-												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
-												onClick={() => handleOpenAssignAnalystModal(row.original)}>
-												<BiSolidUserPlus size={14} />
-												Asignar analista
+												onClick={() => handleOpenUpdatedModal(row.original)}>
+												<BiSolidEditAlt size={14} />
+												Editar laboratorio
 											</button>
 										</li>
 									)}
 
+									{!row?.original?.deletedAt && (
+										<>
+											<li>
+												<button
+													className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
+													onClick={() => handleOpenAssignAnalystModal(row.original)}>
+													<BiSolidUserPlus size={14} />
+													Asignar analista
+												</button>
+											</li>
+
+											{row?.original?.analysts && (
+												<li>
+													<button
+														className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
+														onClick={() => handleOpenRemoveAnalystModal(row.original)}>
+														<BiSolidUserX size={14} />
+														Remover analista
+													</button>
+												</li>
+											)}
+										</>
+									)}
+
 									<li>
-										{row?.original?.active ? (
+										{row?.original?.deletedAt ? (
+											<button
+												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
+												onClick={() => handleOpenRestoredModal(row.original)}>
+												<BiSolidTimer size={14} />
+												Restaurar laboratorio
+											</button>
+										) : row?.original?.active ? (
 											<button
 												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
 												onClick={() => handleOpenDesactivedModal(row.original)}>
 												<BiSolidBullseye size={14} />
-												Deshabilitar
+												Deshabilitar laboratorio
 											</button>
 										) : (
 											<button
 												className='flex items-center gap-2 w-full text-left p-2 hover:bg-slate-200 dark:hover:bg-gray-600/60 rounded-lg transition-all ease-in-out duration-200'
 												onClick={() => handleOpenActivedModal(row.original)}>
 												<BiSolidBullseye size={14} />
-												Habilitar
+												Habilitar laboratorio
 											</button>
 										)}
 									</li>
 
 									<li>
-										<button
-											className='w-full text-left p-2 hover:bg-red-200 dark:hover:bg-red-400 flex items-center gap-2 rounded-lg dark:text-red-400 text-red-500 dark:hover:text-slate-900 transition-all ease-in-out duration-200'
-											onClick={() => handleOpenDeletedModal(row.original)}>
-											<BiSolidTrash size={14} />
-											Eliminar
-										</button>
+										{row?.original?.deletedAt ? (
+											<button
+												className='w-full text-left p-2 hover:bg-red-200 dark:hover:bg-red-400 flex items-center gap-2 rounded-lg dark:text-red-400 text-red-500 dark:hover:text-slate-900 transition-all ease-in-out duration-200'
+												onClick={() => handleOpenDeletedPermanentModal(row.original)}>
+												<BiSolidTrash size={14} />
+												Eliminado permanente
+											</button>
+										) : (
+											<button
+												className='w-full text-left p-2 hover:bg-red-200 dark:hover:bg-red-400 flex items-center gap-2 rounded-lg dark:text-red-400 text-red-500 dark:hover:text-slate-900 transition-all ease-in-out duration-200'
+												onClick={() => handleOpenDeletedModal(row.original)}>
+												<BiSolidTrash size={14} />
+												Eliminar laboratorio
+											</button>
+										)}
 									</li>
 								</ul>
 							</div>
@@ -214,7 +261,7 @@ export const LabTable = ({
 							{...row.getRowProps()}
 							className='hover:bg-slate-50 dark:text-gray-300 text-slate-600 dark:hover:bg-slate-700/30 border-t dark:border-t-gray-700/50'>
 							{row.cells.map(cell => (
-								<td {...cell.getCellProps()} className='px-2 py-0.5'>
+								<td {...cell.getCellProps()} className='px-2 py-2'>
 									{cell.render('Cell')}
 								</td>
 							))}

@@ -109,7 +109,7 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 								variants={modalVariants}
 								onClick={e => e.stopPropagation()}>
 								<div className='flex items-center justify-between'>
-									<h3 className='text-lg font-semibold text-slate-600 dark:text-gray-100'>{text?.title}</h3>
+									<h3 className='text-xl font-semibold text-slate-600 dark:text-gray-100'>{text?.title}</h3>
 
 									<Button
 										variant='none'
@@ -126,7 +126,6 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 								<form
 									onSubmit={handleSubmit(onSubmit)}
 									className='flex flex-col gap-y-4 pb-20 space-y-4 overflow-y-auto text-xs text-gray-600 dark:text-gray-300'>
-									{/* DATOS DE LA INVESTIGACIÓN */}
 									<div className='grid grid-cols-2 gap-4'>
 										<InputFieldZod
 											label='Nombre'
@@ -141,9 +140,8 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 											error={errors.code}
 										/>
 									</div>
-
-									<hr className='border-gray-700' />
-
+									<hr className='dark:border-gray-700' />
+									{/* UNIDAD DE MEDIDA */}
 									<div className='space-y-4'>
 										<h2 className='text-base font-medium'>Unidad de medida</h2>
 										<div className='relative group'>
@@ -187,10 +185,10 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 														key={unit.id_unit_measurement}
 														className={`justify-start p-3 rounded-lg flex flex-col gap-2 cursor-pointer font-medium uppercase transition-all ease-in-out duration-300 ${
 															errors.unit
-																? 'dark:bg-gray-700/40 dark:text-red-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all ease-in-out duration-300'
+																? 'dark:bg-gray-700/40 bg-slate-50 text-red-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all ease-in-out duration-300 hover:bg-slate-100'
 																: watch('unit') === unit.id_unit_measurement
-																	? 'dark:bg-cyan-100 dark:text-gray-800'
-																	: 'dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700'
+																	? 'dark:bg-cyan-100 dark:text-gray-800 bg-slate-200'
+																	: 'dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700 hover:bg-slate-100'
 														}`}>
 														<input
 															type='radio'
@@ -210,11 +208,10 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 										</div>
 									</div>
 
-									<hr className='border-gray-700' />
+									<hr className='dark:border-gray-700' />
 
-									{/* DATOS DE CONSUMO */}
 									<div className='space-y-4'>
-										<h2 className='text-base font-medium'>Datos de consumo</h2>
+										<h2 className='text-base font-medium'>Cantidades</h2>
 										<div className='grid grid-cols-2 gap-4'>
 											<InputFieldZod
 												label='Número de envases'
@@ -223,29 +220,15 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 												error={errors.number_of_containers}
 											/>
 											<InputFieldZod
-												label='Cantidad inicial'
-												placeholder='Cantidad inicial'
-												register={register('initial_quantity')}
-												error={errors.initial_quantity}
-											/>
-										</div>
-										<div className='grid grid-cols-2 gap-4'>
-											<InputFieldZod
-												label='Cantidad consumida'
-												placeholder='Cantidad consumida'
-												register={register('quantity_consumed')}
-												error={errors.quantity_consumed}
-											/>
-											<InputFieldZod
-												label='Cantidad actual'
-												placeholder='Cantidad actual'
+												label='Cantidad'
+												placeholder='Cantidad'
 												register={register('current_quantity')}
 												error={errors.current_quantity}
 											/>
 										</div>
 									</div>
 
-									<hr className='border-gray-700' />
+									<hr className='dark:border-gray-700' />
 
 									{/* OTROS */}
 									<div className='space-y-4'>
@@ -269,20 +252,18 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 										</div>
 									</div>
 
-									<hr className='border-gray-700' />
-
 									{/* CONTROLADO */}
 									<div className='space-y-4'>
-										<h2 className='text-base font-medium'>Seguimiento de control</h2>
+										<h2 className='text-base font-medium'>Sujeto a fiscalización</h2>
 										<div className='grid grid-cols-2 gap-4'>
 											{[
 												{
-													value: 'true',
+													value: 'si',
 													label: 'Si',
 													icon: <BiSolidCheckShield size={32} />,
 												},
 												{
-													value: 'false',
+													value: 'no',
 													label: 'No',
 													icon: <BiSolidShieldX size={32} />,
 												},
@@ -290,24 +271,28 @@ export const ReactiveForm = ({ text, onSubmit, onClose, onChange, loading, formD
 												<label
 													key={option.value}
 													className={`p-4 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer font-medium uppercase transition-all ease-in-out duration-300 ${
-														errors.is_controlled
+														errors.control_tracking
 															? 'dark:bg-gray-700/40 dark:text-red-400 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-															: watch('is_controlled') === option.value
-																? option.value === 'true'
-																	? 'dark:bg-emerald-100 dark:text-gray-800'
-																	: 'dark:bg-red-200 dark:text-gray-800'
-																: 'dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700'
+															: watch('control_tracking') === option.value
+																? option.value === 'si'
+																	? 'bg-emerald-200 text-gray-800'
+																	: 'bg-red-200 text-gray-800'
+																: 'dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700 bg-slate-100 hover:bg-slate-200/70'
 													}`}>
-													<input type='radio' value={option.value} {...register('is_controlled')} className='hidden' />
+													<input
+														type='radio'
+														value={option.value}
+														{...register('control_tracking')}
+														className='hidden'
+													/>
 													<div>{option.icon}</div>
 													<span>{option.label}</span>
 												</label>
 											))}
 
-											{/* Mensaje de error */}
-											{errors.is_controlled && (
+											{errors.control_tracking && (
 												<div className='text-red-500 text-xs flex items-start gap-1 font-normal'>
-													<BiInfoCircle size={16} /> <p>{errors.is_controlled.message}</p>
+													<BiInfoCircle size={16} /> <p>{errors.control_tracking.message}</p>
 												</div>
 											)}
 										</div>

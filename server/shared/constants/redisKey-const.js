@@ -7,6 +7,10 @@ export const REDIS_KEYS = {
 		QUOTE: 'quote',
 		EXPERIMENT: 'experiment',
 	},
+	EXPERIMENT: {
+		CATEGORY: 'category',
+		PARAMETER: 'parameter',
+	},
 	USERS: {
 		USER: 'user',
 		ROLE: 'role',
@@ -27,5 +31,7 @@ export const REDIS_KEYS = {
 	REACTIVES: {
 		REACTIVE: 'reactive',
 		UNIT_MEASUREMENT: 'unit_measurement',
+		KARDEX: 'kardex',
+		CONSUMPTION: 'consumption',
 	},
 }

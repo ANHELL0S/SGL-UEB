@@ -17,7 +17,7 @@ const AccessLabPage = () => {
 
 	if (error) return <p className='text-sm text-red-500'>Error: {error}</p>
 
-	const rolesAccepted = [ROLES.ACCESS_MANAGER, ROLES.DIRECTOR, ROLES.SUPERVISOR]
+	const rolesAccepted = [ROLES.GENERAL_ADMIN, ROLES.ACCESS_MANAGER, ROLES.DIRECTOR, ROLES.SUPERVISOR]
 	const roleAccept = userRoles.some(userRole => rolesAccepted.includes(userRole.type))
 
 	return (

@@ -19,15 +19,9 @@ import { PAGINATION_LIMIT, PAGINATION_PAGE } from '../../../../shared/constants/
 export class LabController {
 	static async getAll(req, res) {
 		const { page = PAGINATION_PAGE, limit = PAGINATION_LIMIT, search = '' } = req?.query
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:page:${page}:limit:${limit}:search:${search}`
 
 		try {
-			const usersCache = await RedisCache.getFromCache(cacheKey)
-			if (usersCache) return sendResponse(res, 200, 'Laboratorios obtenidos exitosamente.', usersCache)
-
 			const labsFound = await LabService.getAllLabs(page, limit === 'all' ? null : limit, search)
-			await RedisCache.setInCache(cacheKey, labsFound)
-
 			return sendResponse(res, 200, 'Laboratorios obtenidos exitosamente.', labsFound)
 		} catch (error) {
 			await logEvent(
@@ -42,19 +36,12 @@ export class LabController {
 	}
 
 	static async getById(req, res) {
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:${req?.params?.id}`
-
 		try {
 			const parsedData = params_schema_zod.safeParse(req?.params)
 			if (!parsedData.success) return sendResponse(res, 400, parsedData.error.errors[0].message)
 
-			const cachedUser = await RedisCache.getFromCache(cacheKey)
-			if (cachedUser) return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', cachedUser)
-
 			const userFound = await LabService.getLabById(req?.params?.id)
 			if (!userFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
-
-			await RedisCache.setInCache(cacheKey, userFound)
 
 			return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', userFound)
 		} catch (error) {
@@ -70,15 +57,9 @@ export class LabController {
 	}
 
 	static async findToName(req, res) {
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:${req?.params?.name}`
-
 		try {
-			const cachedData = await RedisCache.getFromCache(cacheKey)
-			if (cachedData) return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', cachedData)
-
 			const dataFound = await LabService.findToName(req?.params?.name)
 			if (!dataFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
-			await RedisCache.setInCache(cacheKey, dataFound)
 
 			return sendResponse(res, 200, 'Laboratorio obtenido exitosamente.', dataFound)
 		} catch (error) {
@@ -95,7 +76,6 @@ export class LabController {
 
 	static async create(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:*`
 
 		try {
 			const parsedData = lab_schema_zod.safeParse(req.body)
@@ -106,12 +86,9 @@ export class LabController {
 
 			await t.commit()
 
-			await RedisCache.clearCache(cacheKey)
-
 			await logEvent('info', 'Laboratorio creado exitosamente.', { result }, req?.user?.id, req)
 			return sendResponse(res, 201, 'Laboratorio creado exitosamente.', result)
 		} catch (error) {
-			console.log(error)
 			await logEvent(
 				'error',
 				'Error al crear el laboratorio.',
@@ -126,7 +103,6 @@ export class LabController {
 
 	static async update(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req.params)
@@ -141,7 +117,6 @@ export class LabController {
 			const labData = await LabService.updateLab(req?.params?.id, req.body, t)
 			if (labData.error) return sendResponse(res, 400, labData.error)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
 			await logEvent('info', 'Laboratorio actualizado exitosamente.', { labData }, req?.user?.id, req)
@@ -161,7 +136,6 @@ export class LabController {
 
 	static async assignAnalyst(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:*`
 
 		try {
 			const parsedData = assign_analyst_lab_zod.safeParse(req.body)
@@ -170,7 +144,6 @@ export class LabController {
 			const assignAnalystLabData = await LabService.assignAnalystLab(req.body, t)
 			if (assignAnalystLabData.error) return sendResponse(res, assignAnalystLabData.status, assignAnalystLabData.error)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
 			await logEvent('info', 'Analista asignado exitosamente.', { assignAnalystLabData }, req.user.id, req)
@@ -190,7 +163,6 @@ export class LabController {
 
 	static async removeAssignAnalyst(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req.params)
@@ -199,7 +171,6 @@ export class LabController {
 			const assignAnalystLabData = await LabService.removeAssignAnalystLab(req.params.id, t)
 			if (assignAnalystLabData.error) return sendResponse(res, assignAnalystLabData.status, assignAnalystLabData.error)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
 			await logEvent('info', 'Analista asignado exitosamente.', { assignAnalystLabData }, req.user.id, req)
@@ -219,7 +190,6 @@ export class LabController {
 
 	static async changeStatus(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
@@ -233,7 +203,6 @@ export class LabController {
 
 			const userData = await LabService.changeStatusLab(req?.params?.id, req.body, t)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
 			await logEvent('info', 'Estado de laboratorio actualizado exitosamente.', { userData }, req?.user?.id, req)
@@ -253,7 +222,6 @@ export class LabController {
 
 	static async delete(req, res) {
 		const t = await db_main.transaction()
-		const cacheKey = `cache:${REDIS_KEYS.LABS.LAB}:*`
 
 		try {
 			const parsedParams = params_schema_zod.safeParse(req?.params)
@@ -265,15 +233,74 @@ export class LabController {
 			const labData = await LabService.deleteLab(req?.params?.id, t)
 			if (labData.error) return sendResponse(res, 400, labData.error)
 
-			await RedisCache.clearCache(cacheKey)
 			await t.commit()
 
 			await logEvent('info', 'Laboratorio eliminado exitosamente.', { labData }, req?.user?.id, req)
 			return sendResponse(res, 200, 'Laboratorio eliminado exitosamente.')
 		} catch (error) {
+			console.log(error)
 			await logEvent(
 				'error',
 				'Error al eliminar el laboratorio.',
+				{ error: error.message, stack: error.stack },
+				req?.user?.id,
+				req
+			)
+			await t.rollback()
+			return sendResponse(res, 500)
+		}
+	}
+
+	static async restore(req, res) {
+		const t = await db_main.transaction()
+
+		try {
+			const parsedParams = params_schema_zod.safeParse(req?.params)
+			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
+
+			const userFound = await LabService.getLabById(req?.params?.id)
+			if (!userFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
+
+			const labData = await LabService.restoreLab(req?.params?.id, t)
+
+			await t.commit()
+
+			await logEvent('info', 'Laboratorio restaurado exitosamente.', { labData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Laboratorio restaurado exitosamente.')
+		} catch (error) {
+			await logEvent(
+				'error',
+				'Error al restaurado laboratorio.',
+				{ error: error.message, stack: error.stack },
+				req?.user?.id,
+				req
+			)
+			await t.rollback()
+			return sendResponse(res, 500)
+		}
+	}
+
+	static async deletePermanent(req, res) {
+		const t = await db_main.transaction()
+
+		try {
+			const parsedParams = params_schema_zod.safeParse(req?.params)
+			if (!parsedParams.success) return sendResponse(res, 400, parsedParams.error.errors[0].message)
+
+			const userFound = await LabService.getLabById(req?.params?.id)
+			if (!userFound) return sendResponse(res, 404, 'Laboratorio no encontrado.')
+
+			const labData = await LabService.deletePermanentLab(req?.params?.id, t)
+			if (labData.error) return sendResponse(res, 400, labData.error)
+
+			await t.commit()
+
+			await logEvent('info', 'Laboratorio eliminado permanentemente.', { labData }, req?.user?.id, req)
+			return sendResponse(res, 200, 'Laboratorio eliminado permanentemente.')
+		} catch (error) {
+			await logEvent(
+				'error',
+				'Error al eliminar permanentemente laboratorio.',
 				{ error: error.message, stack: error.stack },
 				req?.user?.id,
 				req
@@ -323,7 +350,7 @@ export class LabController {
 			const institutionData = {
 				name: infoU.institution_name,
 				address: infoU.address,
-				contact: `${infoU.contact_phone} | ${infoU.contact_email}`,
+				contact: `${infoU.contact_phone}`,
 			}
 
 			await logEvent('info', 'Se generó un reporte PDF de laboratorios.', null, req.user.id, req)
