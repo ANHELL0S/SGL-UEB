@@ -7,7 +7,7 @@ import { NotFound } from '../../../../components/Banner/NotFound'
 import { useRoles } from '../../../../helpers/roleControl.helper'
 import { formatISOToDate } from '@/helpers/dateTimeZone.helper'
 import { Button } from '@/components/Button/Button'
-import { BiSolidCheckCircle, BiSolidTrash, BiSolidXCircle } from 'react-icons/bi'
+import { BiSolidCheckCircle, BiSolidDownArrow, BiSolidDownload, BiSolidTrash, BiSolidXCircle } from 'react-icons/bi'
 import { ModalDeletedReport, ModalEmitedReport, ModalNotEmitedReport } from '../Form/Report/ReportCRUD'
 import { ROLES } from '@/helpers/constants.helper'
 
@@ -107,7 +107,8 @@ export const ReportCard = ({ quoteData }) => {
 												<td className='p-2'>
 													<span
 														className={`${isCollaboratingAnalystDeleted ? 'text-red-500 line-through' : ''} ${isSeniorAnalystDeleted ? 'text-red-500 line-through' : ''}`}>
-														{report.senior_analyst?.code} • {report.collaborating_analyst?.code}
+														{report.senior_analyst?.code}{' '}
+														{report.collaborating_analyst?.code && `• ${report.collaborating_analyst.code}`}
 													</span>
 												</td>
 												<td className='p-2'>{report.sample.name}</td>

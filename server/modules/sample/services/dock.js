@@ -1,8 +1,8 @@
 import {
 	Document,
-	Packer,
 	Paragraph,
 	TextRun,
+	ImageRun,
 	AlignmentType,
 	Table,
 	TableRow,
@@ -12,6 +12,20 @@ import {
 } from 'docx'
 import { formatISOToDate, getDateNow } from '../../../shared/utils/time-util.js'
 
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Obtener la ruta del archivo actual
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Ruta de la imagen
+const logoPath = path.join(__dirname, '../../../assets/images/UEB.png')
+
+// Leer la imagen como buffer
+const imageBuffer = fs.readFileSync(logoPath)
+
 export const generateAntioxidantReportWordDoc = (sample, newReport) => {
 	// ---------------------------
 	// 1. DATOS PREVIOS
@@ -20,7 +34,7 @@ export const generateAntioxidantReportWordDoc = (sample, newReport) => {
 	const nombreLaboratorio = 'LABORATORIOS DE INVESTIGACIÓN Y VINCULACIÓN'
 	const codigo = 'FPG12-01'
 	const version = '1'
-	const anio = '2021'
+	const anio = new Date().getFullYear()
 	const pagina = '1'
 
 	// Datos de la muestra
@@ -64,19 +78,9 @@ export const generateAntioxidantReportWordDoc = (sample, newReport) => {
 						children: [
 							new Paragraph({
 								children: [
-									new TextRun({
-										text: encabezadoInstitucion,
-										bold: true,
-										size: 20,
-									}),
-								],
-							}),
-							new Paragraph({
-								children: [
-									new TextRun({
-										text: nombreLaboratorio,
-										bold: true,
-										size: 20,
+									new ImageRun({
+										data: imageBuffer,
+										transformation: { width: 300, height: 60 }, // Ajustar tamaño
 									}),
 								],
 							}),
