@@ -1,3 +1,5 @@
+[![Screenshot-2025-05-10-00-03-47-1366x768.png](https://i.postimg.cc/J0H7JW5v/Screenshot-2025-05-10-00-03-47-1366x768.png)](https://postimg.cc/p5xtb47J)
+
 # Proyecto PERN
 
 Este proyecto es una aplicación que utiliza la arquitectura **PERN** (PostgreSQL, Express, React, Node.js).
