@@ -7,6 +7,7 @@ const SelectFieldZod = ({ label, name, options, onChange, register, error }) => 
 				<label className={`${error ? 'text-red-500' : 'text-slate-600 dark:text-slate-200'}`}>{label}</label>
 				<span className='text-red-500'>*</span>
 			</div>
+
 			<select
 				{...register(name)}
 				onChange={onChange}

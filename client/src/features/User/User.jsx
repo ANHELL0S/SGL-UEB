@@ -246,6 +246,7 @@ const UserSection = () => {
 									<BiCaretRight size={16} />
 								</button>
 							</div>
+
 							<div className='border-l pl-4 dark:border-gray-600'>
 								<span>
 									{totalPages && totalRecords

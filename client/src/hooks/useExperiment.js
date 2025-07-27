@@ -5,7 +5,6 @@ export const useAllCategoriesStore = (limit_record = 10) => {
 	const [categories, setCategories] = useState(null)
 	const [error, setError] = useState(null)
 	const [loading, setLoading] = useState(true)
-
 	const [page, setPage] = useState(1)
 	const [limit, setLimit] = useState(limit_record)
 	const [search, setSearch] = useState('')

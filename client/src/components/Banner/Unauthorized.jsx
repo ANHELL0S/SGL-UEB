@@ -43,7 +43,7 @@ export const Unauthorized = () => {
 				</div>
 
 				<div className='relative w-full lg:mt-0 lg:w-1/2'>
-					<img className='w-full max-w-sm mx-auto lg:max-w-lg' src={pathimg} alt='401' />
+					<Image className='w-full max-w-sm mx-auto lg:max-w-lg' src={pathimg} alt='401' />
 				</div>
 			</div>
 		</>
